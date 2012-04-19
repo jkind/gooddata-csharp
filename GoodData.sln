@@ -1,0 +1,125 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodDataService", "GoodDataService\GoodDataService.csproj", "{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodDataTests", "GoodDataTests\GoodDataTests.csproj", "{3CDC4675-657B-4013-845C-1EEBB690C4AC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D7667D66-BD94-48D5-81F6-B0E5A153A7A0}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AWS-Dev|Any CPU = AWS-Dev|Any CPU
+		AWS-Dev|Mixed Platforms = AWS-Dev|Mixed Platforms
+		AWS-Dev|x86 = AWS-Dev|x86
+		Debug - AdminBackEnd|Any CPU = Debug - AdminBackEnd|Any CPU
+		Debug - AdminBackEnd|Mixed Platforms = Debug - AdminBackEnd|Mixed Platforms
+		Debug - AdminBackEnd|x86 = Debug - AdminBackEnd|x86
+		Debug - No View Build|Any CPU = Debug - No View Build|Any CPU
+		Debug - No View Build|Mixed Platforms = Debug - No View Build|Mixed Platforms
+		Debug - No View Build|x86 = Debug - No View Build|x86
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Frontend Tests|Any CPU = Frontend Tests|Any CPU
+		Frontend Tests|Mixed Platforms = Frontend Tests|Mixed Platforms
+		Frontend Tests|x86 = Frontend Tests|x86
+		Local - Bill|Any CPU = Local - Bill|Any CPU
+		Local - Bill|Mixed Platforms = Local - Bill|Mixed Platforms
+		Local - Bill|x86 = Local - Bill|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+		Staging|Any CPU = Staging|Any CPU
+		Staging|Mixed Platforms = Staging|Mixed Platforms
+		Staging|x86 = Staging|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.AWS-Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.AWS-Dev|Any CPU.Build.0 = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.AWS-Dev|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.AWS-Dev|Mixed Platforms.Build.0 = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.AWS-Dev|x86.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug - AdminBackEnd|Any CPU.ActiveCfg = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug - AdminBackEnd|Any CPU.Build.0 = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug - AdminBackEnd|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug - AdminBackEnd|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug - AdminBackEnd|x86.ActiveCfg = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug - No View Build|Any CPU.ActiveCfg = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug - No View Build|Any CPU.Build.0 = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug - No View Build|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug - No View Build|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug - No View Build|x86.ActiveCfg = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Frontend Tests|Any CPU.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Frontend Tests|Any CPU.Build.0 = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Frontend Tests|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Frontend Tests|Mixed Platforms.Build.0 = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Frontend Tests|x86.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Local - Bill|Any CPU.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Local - Bill|Any CPU.Build.0 = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Local - Bill|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Local - Bill|Mixed Platforms.Build.0 = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Local - Bill|x86.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Release|x86.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Staging|Any CPU.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Staging|Any CPU.Build.0 = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Staging|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Staging|Mixed Platforms.Build.0 = Release|Any CPU
+		{9392BEE9-EFEC-48F9-A0C2-AD1FEB33EE3B}.Staging|x86.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.AWS-Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.AWS-Dev|Any CPU.Build.0 = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.AWS-Dev|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.AWS-Dev|Mixed Platforms.Build.0 = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.AWS-Dev|x86.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug - AdminBackEnd|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug - AdminBackEnd|Any CPU.Build.0 = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug - AdminBackEnd|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug - AdminBackEnd|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug - AdminBackEnd|x86.ActiveCfg = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug - No View Build|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug - No View Build|Any CPU.Build.0 = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug - No View Build|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug - No View Build|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug - No View Build|x86.ActiveCfg = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Frontend Tests|Any CPU.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Frontend Tests|Any CPU.Build.0 = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Frontend Tests|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Frontend Tests|Mixed Platforms.Build.0 = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Frontend Tests|x86.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Local - Bill|Any CPU.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Local - Bill|Any CPU.Build.0 = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Local - Bill|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Local - Bill|Mixed Platforms.Build.0 = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Local - Bill|x86.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Release|x86.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Staging|Any CPU.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Staging|Any CPU.Build.0 = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Staging|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Staging|Mixed Platforms.Build.0 = Release|Any CPU
+		{3CDC4675-657B-4013-845C-1EEBB690C4AC}.Staging|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
