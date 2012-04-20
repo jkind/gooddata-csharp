@@ -25,7 +25,7 @@ namespace GoodDataService
 		private static string CreateUserData(string email, int validaityOffsetInMinutes = 10)
 		{
 			return "{\"email\":\"" + email + "\",\"validity\":" +
-			       DateTime.UtcNow.AddMinutes(validaityOffsetInMinutes).ToUnixTime() + "}";
+				   Math.Round(DateTime.UtcNow.AddMinutes(validaityOffsetInMinutes).ToUnixTime()) + "}";
 		}
 
 		private static string EncodeUserData(string input)

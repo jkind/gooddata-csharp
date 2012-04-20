@@ -16,7 +16,7 @@ namespace GoodDataService
 		/// <returns></returns>
 		public static double ToUnixTime(this DateTime dateTime)
 		{
-			return (dateTime - new DateTime(1970, 1, 1).ToUniversalTime()).TotalSeconds;
+			return (dateTime - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds;
 		}
 	}
 }

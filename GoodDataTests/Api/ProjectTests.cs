@@ -31,5 +31,31 @@ namespace GoodDataTests.Api
 
 			Assert.IsNull(projects);
 		}
+
+		[Test]
+		[Ignore]
+		public void CreateProject()
+		{
+			var title = "GroupCommerce";
+			var projectId = reportingService.CreateProject(profileId, title, "Summary" + title);
+
+			var projects = reportingService.FindProjectByTitle(profileId, title);
+			Assert.NotNull(projects);
+		}
+
+		[Test]
+		[Ignore]
+		public void DeleteProject()
+		{
+			var title = "GroupCommerce";
+			var projects = reportingService.FindProjectByTitle(profileId, title);
+			reportingService.DeleteProject(projects.ProjectId);
+
+			projects = reportingService.FindProjectByTitle(profileId, title);
+
+			Assert.IsNull(projects);
+		}
+
+		
 	}
 }
