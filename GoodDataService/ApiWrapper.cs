@@ -277,10 +277,12 @@ namespace GoodDataService
 			webRequest.Headers.Add("Accept-Charset", "utf-8");
 		}
 
-		public List<AccountResponseSettingWrapper> GetDomainUsers()
+		public List<AccountResponseSettingWrapper> GetDomainUsers(string domain ="")
 		{
+			if (string.IsNullOrEmpty(domain))
+				domain = Config.Domain;
 			var list = new List<AccountResponseSettingWrapper>();
-			var url = string.Concat(Config.Url, DOMAIN_URI, "/", Config.Domain, DOMAIN_USERS_SUFFIX);
+			var url = string.Concat(Config.Url, DOMAIN_URI, "/", domain, DOMAIN_USERS_SUFFIX);
 			var response = MakeRequest(url, "GET", null);
 			var usersResponse =
 				JsonConvert.DeserializeObject(response, typeof (CreateDomainUserResponse)) as CreateDomainUserResponse;
@@ -312,9 +314,9 @@ namespace GoodDataService
 			return userWrapper != null ? userWrapper.User : null;
 		}
 
-		public AccountResponseSetting FindDomainUsersByLogin(string email)
+		public AccountResponseSetting FindDomainUsersByLogin(string email,string domain="")
 		{
-			var users = GetDomainUsers();
+			var users = GetDomainUsers(domain);
 			var userWrapper =
 				users.FirstOrDefault(u => string.Compare(u.AccountSetting.Login, email, StringComparison.OrdinalIgnoreCase) == 0);
 			return userWrapper != null ? userWrapper.AccountSetting : null;

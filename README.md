@@ -50,16 +50,16 @@ Sample GPG Commands
 ---------------
 **Sign**
 
-gpg --armor -u gooddata@gmail.com --output jon.kind@gmail.com_userdata.txt_signed.txt --sign jon.kind@gmail.com_userdata.txt
+gpg --armor -u gooddata@yourcompany.com --output test_userdata_signed.txt --sign test_userdata.txt
 
 **Encrypt**
 
-gpg --armor --output jon.kind@gmail.com_userdata.txt_signed.txt --encrypt --recipient security@gooddata.com jon.kind@gmail.com_userdata.txt_signed.txt
+gpg --armor --output test_userdata_encrypted.txt --encrypt --recipient security@gooddata.com test_userdata_signed.txt
 
 **Sign &amp; Encrypt**
 
-gpg --armor --output jon.kind@gmail.com_userdata._encryptedsigned.txt --recipient security@gooddata.com --encrypt --sign jon.kind@gmail.com_userdata.txt
+gpg --armor --output test_userdata_encryptedsigned.txt --recipient security@gooddata.com --encrypt --sign test_userdata.txt
 
 **Decrypt**
 
-gpg --output jon.kind@gmail.com._decrupt.txt --decrypt jon.kind@gmail.com_userdata._encryptedsigned.txt
+gpg --output test_userdata_decrypted.txt --decrypt test_userdata_encrypted.txt

@@ -36,8 +36,8 @@ namespace GoodDataTests.Api
 		[Ignore]
 		public void CreateProject()
 		{
-			var title = "GroupCommerce";
-			var projectId = reportingService.CreateProject(profileId, title, "Summary" + title);
+			var title = reportingService.Config.Domain + "Tester";
+			var projectId = reportingService.CreateProject(profileId, title, "Summary " + title);
 
 			var projects = reportingService.FindProjectByTitle(profileId, title);
 			Assert.NotNull(projects);
@@ -47,7 +47,7 @@ namespace GoodDataTests.Api
 		[Ignore]
 		public void DeleteProject()
 		{
-			var title = "GroupCommerce";
+			var title = reportingService.Config.Domain + "Tester";
 			var projects = reportingService.FindProjectByTitle(profileId, title);
 			reportingService.DeleteProject(projects.ProjectId);
 

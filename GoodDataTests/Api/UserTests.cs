@@ -111,15 +111,10 @@ namespace GoodDataTests.Api
 		[Ignore]
 		public void CreateUser()
 		{
-			//var login = string.Format("ssotester@{0}.com", reportingService.Config.Domain);
-			//var password = "password";
-			//var firstName = "sso";
-			//var lastName = "admin";
-
-			var login = "jkind+sso@groupcommerce.com";
+			var login = string.Format("ssotester@{0}.com", reportingService.Config.Domain);
 			var password = "password";
-			var firstName = "jonathan";
-			var lastName = "kind";
+			var firstName = "sso";
+			var lastName = "admin";
 
 			var newProfileId = reportingService.CreateUser(login, password, password, firstName, lastName);
 			Assert.IsNotNullOrEmpty(newProfileId);
@@ -146,9 +141,8 @@ namespace GoodDataTests.Api
 		[Ignore]
 		public void AddUsertoProject()
 		{
-			var project = reportingService.FindProjectByTitle(profileId,"GroupCommerce");
-			//var email = string.Format("ssotester@{0}.com", reportingService.Config.Domain);
-			var email = "jkind+sso@groupcommerce.com";
+			var project = reportingService.FindProjectByTitle(profileId, reportingService.Config.Domain);
+			var email = string.Format("ssotester@{0}.com", reportingService.Config.Domain);
 			var domainUser = reportingService.FindDomainUsersByLogin(email);
 			var projectUser = reportingService.FindProjectUsersByEmail(project.ProjectId,email);
 			reportingService.AddUsertoProject(project.ProjectId, domainUser.ProfileId, ApiWrapper.Roles.Editor);
