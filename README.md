@@ -18,9 +18,9 @@ SSOProvider
 1. Install gpg4win http://www.gpg4win.org/download.html
 2. Open cmd prompt
 3. Run: "gpg --version" to verify the installation.
-4. Run: "gpg --import [path]\gooddata-sso.pub"  to import the gooddata public key. _NOTE:_ Replace [path]. Keys are located in this project or can be found here, http://developer.gooddata.com/docs/gooddata-sso.pub
+4. Run: "gpg --import [path]\gooddata-sso.pub"  to import the gooddata public key. **NOTE:** Replace [path]. Keys are located in this project or can be found here, http://developer.gooddata.com/docs/gooddata-sso.pub
 5. Run: "gpg --import [path]\gooddata-sso-testing.pub"  to import the gooddata testing public key.
-6. Run: "gpg --gen-key" and follow the command prompts. Use something like gooddata@yourcompanydomain.com as the email address. _DONT FORGET YOUR PASSPHRASE_
+6. Run: "gpg --gen-key" and follow the command prompts. Use something like gooddata@yourcompanydomain.com as the email address. **DONT FORGET YOUR PASSPHRASE**
 8. Run: "gpg --output C:\[path]\gooddata_yourcompany.pub --export gooddata@yourcompanydomain.com"
 9. Run: "gpg --output C:\[path]\gooddata_yourcompany_private.key --export-secret-key gooddata@yourcompanydomain.com"
 10. Run: "gpg --list-keys" This should return 3 entries: 1) security@gooddata.com 2) ops@gooddata.com 3) gooddata@yourcompanydomain.com
@@ -48,18 +48,18 @@ Currently only contains methods for:
 
 Sample GPG Commands
 ---------------
-_Sign_
+**Sign**
 
 gpg --armor -u gooddata@gmail.com --output jon.kind@gmail.com_userdata.txt_signed.txt --sign jon.kind@gmail.com_userdata.txt
 
-_Encrypt_
+**Encrypt**
 
 gpg --armor --output jon.kind@gmail.com_userdata.txt_signed.txt --encrypt --recipient security@gooddata.com jon.kind@gmail.com_userdata.txt_signed.txt
 
-_Sign &amp; Encrypt_
+**Sign &amp; Encrypt**
 
 gpg --armor --output jon.kind@gmail.com_userdata._encryptedsigned.txt --recipient security@gooddata.com --encrypt --sign jon.kind@gmail.com_userdata.txt
 
-_Decrypt_
+**Decrypt**
 
 gpg --output jon.kind@gmail.com._decrupt.txt --decrypt jon.kind@gmail.com_userdata._encryptedsigned.txt
