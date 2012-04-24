@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -269,6 +270,16 @@ namespace GoodDataService
 		private void SetupRequest(HttpWebRequest webRequest, string method)
 		{
 			webRequest.CookieContainer = _cookieJar;
+			//Hack to fix cookies domain
+			//http://social.microsoft.com/Forums/en-US/netfxnetcom/thread/1297afc1-12d4-4d75-8d3f-7563222d234c
+			var table = (Hashtable)_cookieJar.GetType().InvokeMember("m_domainTable", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetField | System.Reflection.BindingFlags.Instance, null, _cookieJar, new object[] { }); 
+	        var keys = new ArrayList(table.Keys); 
+	        foreach (var key in keys) 
+	        { 
+	            var newKey = ((string) key).Substring(1); 
+	            table[newKey] = table[key]; 
+	        }
+
 			webRequest.Method = method.ToUpper();
 			webRequest.ServicePoint.Expect100Continue = false;
 			webRequest.ContentType = "application/json; charset=utf-8";

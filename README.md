@@ -13,8 +13,9 @@ There are two basic classes
 	My modification fixes the Sign method to respect the armor attribute which is required for integration with gooddata
 
 ####To get the code running you'll need to:
-1. Install gpg4win http://www.gpg4win.org/download.html
-2. Setup your keys
+1. Install gpg4win http://www.gpg4win.org/download.html *(Note: Install the program to C:\Program Files\GnuPG)*
+2. Configure IIS *(Note: In IIS 7+ this will only work under the ApplicationPoolIdentity with the Load User Profile flag set to true)
+3. Setup your keys
 
 To setup keys (*Note: replace 'yourcompany.com' and [path] with approproate values*)
 
@@ -40,7 +41,6 @@ Verify key setup
 2. Run: "gpg --armor -u gooddata@yourcompany.com --output test_userdata_signed.txt --sign [path]\test_userdata.txt" *Note: A sample file can be found in this project*
 3. Run: "gpg --armor --output test_userdata_encrypted.txt --encrypt --recipient security@gooddata.com test_userdata.txt"
 3. Run: "gpg --output test_userdata_decrypted.txt --decrypt test_userdata_encrypted.txt"
-
 
 
 ####To run the tests:
