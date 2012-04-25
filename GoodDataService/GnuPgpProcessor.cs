@@ -14,6 +14,7 @@ namespace GoodDataService
 		public GnuPgpProcessor()
 		{
 			gpg = new GnuPG();
+			gpg.HomePath = @"C:\gnupg";
 		}
 
 		/// <summary>
