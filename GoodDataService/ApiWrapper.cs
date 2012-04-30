@@ -14,19 +14,14 @@ using Newtonsoft.Json.Serialization;
 
 namespace GoodDataService
 {
+	public enum Roles
+	{
+		Admin = 1,
+		Editor = 2,
+		DashboardOnly = 3
+	}
 	public class ApiWrapper
 	{
-		#region Roles enum
-
-		public enum Roles
-		{
-			Admin = 1,
-			Editor = 2,
-			DashboardOnly = 3
-		}
-
-		#endregion
-
 		public static readonly string ATTR_QUERY = "/query/attributes";
 		public static readonly string DATA_INTERFACES_URI = "/ldm/singleloadinterface";
 		public static readonly string DML_EXEC_URI = "/dml/manage";
@@ -58,11 +53,22 @@ namespace GoodDataService
 
 
 		public readonly CookieContainer _cookieJar;
+		public string ProfileId { get; set; }
 
 		public ApiWrapper()
 		{
 			Config = GoodDataConfigurationSection.GetConfig();
 			_cookieJar = new CookieContainer();
+			Authenticate(Config.Login, Config.Password);
+			GetToken();
+		}
+
+		public ApiWrapper(string userName, string password)
+		{
+			Config = GoodDataConfigurationSection.GetConfig();
+			_cookieJar = new CookieContainer();
+			Authenticate(userName,password);
+			GetToken();
 		}
 
 		public GoodDataConfigurationSection Config { get; set; }
@@ -73,7 +79,7 @@ namespace GoodDataService
 			MakeRequest(url, "GET", "");
 		}
 
-		public string Authenticate(string userName, string password)
+		public void Authenticate(string userName, string password)
 		{
 			var url = Config.Url + LOGIN_URI;
 			var payload = new AuthenticationRequest
@@ -88,10 +94,8 @@ namespace GoodDataService
 			var userResponse = JsonConvert.DeserializeObject(response, typeof (AuthenticationResponse)) as AuthenticationResponse;
 			if (userResponse != null)
 			{
-				var profileId = userResponse.UserLogin.State.ExtractId(LOGIN_URI);
-				return profileId;
+				ProfileId = userResponse.UserLogin.State.ExtractId(LOGIN_URI);
 			}
-			return null;
 		}
 
 		// callback used to validate the certificate in an SSL conversation
@@ -112,10 +116,10 @@ namespace GoodDataService
 			MakeRequest(url, "DELETE", null);
 		}
 
-		public List<ProjectDto> GetProjects(string profileId)
+		public List<ProjectDto> GetProjects()
 		{
 			var list = new List<ProjectDto>();
-			var url = string.Concat(Config.Url, PROFILE_URI, "/", profileId, "/projects");
+			var url = string.Concat(Config.Url, PROFILE_URI, "/", ProfileId, "/projects");
 			var response = MakeRequest(url, "GET", null);
 			var projectResponse = JsonConvert.DeserializeObject(response, typeof (ProjectsDto)) as ProjectsDto;
 			if (projectResponse != null)
@@ -125,7 +129,7 @@ namespace GoodDataService
 			return list;
 		}
 
-		public string CreateProject(string profileId, string title, string summary)
+		public string CreateProject(string title, string summary)
 		{
 			var url = string.Concat(Config.Url, PROJECTS_URI);
 			var payload = new ProjectDto
@@ -169,12 +173,12 @@ namespace GoodDataService
 
 		public void AddUsertoProject(string projectId, string userId, Roles role = Roles.DashboardOnly)
 		{
-			var url = string.Concat(Config.Url, PROJECTS_URI, "/", projectId, DOMAIN_USERS_SUFFIX);
-			var payload = new AddUserToProjectRequest
+			var url = string.Concat(Config.Url, PROJECTS_URI, "/", projectId, PROJECT_USERS_SUFFIX);
+			var payload = new ProjectUserRequest
 			              	{
-			              		User = new AddUserToProjectRequest.UserRequest
+			              		User = new ProjectUserRequest.UserRequest
 			              		       	{
-			              		       		Content = new AddUserToProjectRequest.UserRequest.ContentRequest
+			              		       		Content = new ProjectUserRequest.UserRequest.ContentRequest
 			              		       		          	{
 			              		       		          		Status = "ENABLED",
 			              		       		          		UserRoles = new List<string>
@@ -183,7 +187,7 @@ namespace GoodDataService
 			              		       		          		            		              "/", (int) role)
 			              		       		          		            	}
 			              		       		          	},
-			              		       		Links = new AddUserToProjectRequest.UserRequest.LinksRequest
+			              		       		Links = new ProjectUserRequest.UserRequest.LinksRequest
 			              		       		        	{
 			              		       		        		Self = string.Concat(PROFILE_URI, "/", userId)
 			              		       		        	}
@@ -191,6 +195,27 @@ namespace GoodDataService
 			              	};
 			PostRequest(url, payload);
 		}
+
+		public void UpdateProjectUserStatus(string projectId, string profileId, bool enabled)
+		{	
+			var url = string.Concat(Config.Url, PROJECTS_URI, "/", projectId, PROJECT_USERS_SUFFIX);
+			var payload = new ProjectUserRequest
+			{
+				User = new ProjectUserRequest.UserRequest
+				{
+					Content = new ProjectUserRequest.UserRequest.ContentRequest
+					{
+						Status = (enabled) ? "ENABLED": "DISABLED"
+					},
+					Links = new ProjectUserRequest.UserRequest.LinksRequest
+					{
+						Self = string.Concat(PROFILE_URI, "/", profileId)
+					}
+				}
+			};
+			PostRequest(url, payload);
+		}
+
 
 		private string PostRequest(string url, object postData)
 		{
@@ -339,9 +364,9 @@ namespace GoodDataService
 			MakeRequest(url, "DELETE", null);
 		}
 
-		public Project FindProjectByTitle(string profileId, string title)
+		public Project FindProjectByTitle(string title)
 		{
-			var projects = GetProjects(profileId);
+			var projects = GetProjects();
 			var projectWrapper = projects.FirstOrDefault(u => string.Compare(u.Project.Meta.Title, title, StringComparison.OrdinalIgnoreCase) == 0);
 			return projectWrapper != null ? projectWrapper.Project : null;
 		}

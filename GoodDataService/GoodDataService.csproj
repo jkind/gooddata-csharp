@@ -50,7 +50,7 @@
   <ItemGroup>
     <Compile Include="ApiWrapper.cs" />
     <Compile Include="GnuPgpProcessor.cs" />
-    <Compile Include="Models\AddUserToProjectRequest.cs" />
+    <Compile Include="Models\ProjectUserRequest.cs" />
     <Compile Include="Configuration\GoodDataConfigurationSection.cs" />
     <Compile Include="Models\CreateDomainUser.cs" />
     <Compile Include="Models\ErrorDto.cs" />

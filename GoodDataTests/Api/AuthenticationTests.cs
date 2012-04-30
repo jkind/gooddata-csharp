@@ -15,16 +15,16 @@ namespace GoodDataTests.Api
 		[Test]
 		public void Authenticate_GoodCredentials_ExpectSucces()
 		{
-			var profileId = reportingService.Authenticate(reportingService.Config.Login, reportingService.Config.Password);
-			Assert.IsNotNullOrEmpty(profileId);
+			reportingService.Authenticate(reportingService.Config.Login, reportingService.Config.Password);
+			Assert.IsNotNullOrEmpty(reportingService.ProfileId);
 		}
 
 		[Test]
 		public void GetToken_ExpectSuccess()
 		{
-			var profileId = reportingService.Authenticate(reportingService.Config.Login, reportingService.Config.Password);
+			reportingService.Authenticate(reportingService.Config.Login, reportingService.Config.Password);
 			reportingService.GetToken();
-			Assert.IsNotNullOrEmpty(profileId);
+			Assert.IsNotNullOrEmpty(reportingService.ProfileId);
 		}
 	}
 }

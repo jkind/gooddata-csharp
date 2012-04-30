@@ -2,7 +2,7 @@
 
 namespace GoodDataService.Models
 {
-	public class AddUserToProjectRequest
+	public class ProjectUserRequest
 	{
 		public UserRequest User { get; set; }
 

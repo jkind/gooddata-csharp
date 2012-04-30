@@ -11,7 +11,7 @@ namespace GoodDataTests
 		public void GenerateToken_ValidEmail_ExpectSucces()
 		{
 			var service = new SsoProvider();
-			var token = service.GenerateToken("jkind@gmail.com");
+			var token = service.GenerateToken(service.Config.Login);
 			Assert.IsNotNullOrEmpty(token);
 			Assert.Less(0, token.IndexOf("BEGIN+PGP+MESSAGE"));
 		}
