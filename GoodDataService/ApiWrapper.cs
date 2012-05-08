@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using GoodDataService.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace GoodDataService
@@ -20,6 +21,13 @@ namespace GoodDataService
 		Editor = 2,
 		DashboardOnly = 3
 	}
+
+	public enum QueryTypes
+	{
+		Dashboard = 1,
+		Report = 2
+	}
+
 	public class ApiWrapper
 	{
 		public static readonly string ATTR_QUERY = "/query/attributes";
@@ -48,6 +56,7 @@ namespace GoodDataService
 		public static readonly string PROJECT_USERS_SUFFIX = "/users";
 		public static readonly string PULL_URI = "/etl/pull";
 		public static readonly string REPORT_QUERY = "/query/reports";
+		public static readonly string DASHBOARD_QUERY = "/query/projectdashboards";
 		public static readonly string SLI_DESCRIPTOR_URI = "/descriptor";
 		public static readonly string TOKEN_URI = "/gdc/account/token";
 
@@ -369,6 +378,25 @@ namespace GoodDataService
 			var projects = GetProjects();
 			var projectWrapper = projects.FirstOrDefault(u => string.Compare(u.Project.Meta.Title, title, StringComparison.OrdinalIgnoreCase) == 0);
 			return projectWrapper != null ? projectWrapper.Project : null;
+		}
+
+		public SortedDictionary<string, string> Query(string projectId, QueryTypes queryTypes)
+		{
+			var list = new SortedDictionary<string, string>();
+			var url = string.Concat(Config.Url, MD_URI, projectId, REPORT_QUERY);
+			if (queryTypes == QueryTypes.Dashboard)
+			{
+				url = string.Concat(Config.Url, MD_URI, projectId, DASHBOARD_QUERY);
+			}
+			dynamic response = JsonConvert.DeserializeObject(MakeRequest(url, "GET", null));
+			var entries = response.query.entries;
+			foreach (var entry in entries)
+			{
+				string title = entry.title;
+				string reportLink = entry.link;
+				list.Add(title, reportLink);
+			}
+			return list;
 		}
 	}
 }
