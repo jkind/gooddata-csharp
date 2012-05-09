@@ -138,7 +138,7 @@ namespace GoodDataService
 			return list;
 		}
 
-		public string CreateProject(string title, string summary)
+		public string CreateProject(string title, string summary, string template="")
 		{
 			var url = string.Concat(Config.Url, PROJECTS_URI);
 			var payload = new ProjectDto
@@ -152,7 +152,8 @@ namespace GoodDataService
 			              		          		Meta = new Meta
 			              		          		       	{
 			              		          		       		Title = title,
-			              		          		       		Summary = summary
+			              		          		       		Summary = summary,
+															ProjectTemplate = template
 			              		          		       	}
 			              		          	}
 			              	};

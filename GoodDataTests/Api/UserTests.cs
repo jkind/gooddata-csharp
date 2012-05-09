@@ -89,7 +89,7 @@ namespace GoodDataTests.Api
 		[Ignore]
 		public void UpdateProjectUserStatus_SetDisabled_ExpectDsiabled()
 		{
-			var email = "jkind+ssotester1@groupcommerce.com";
+			var email = reportingService.Config.Login;
 			var project = reportingService.FindProjectByTitle(reportingService.Config.Domain);
 			var user = reportingService.FindProjectUsersByEmail(project.ProjectId, email);
 			reportingService.UpdateProjectUserStatus(project.ProjectId, user.ProfileId, false);
