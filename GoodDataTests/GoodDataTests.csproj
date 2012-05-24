@@ -50,7 +50,7 @@
   <ItemGroup>
     <Compile Include="Api\AuthenticationTests.cs" />
     <Compile Include="Api\QueryTests.cs" />
-    <Compile Include="Sso\SsoTests.cs" />
+    <Compile Include="SSO\SsoTests.cs" />
     <Compile Include="Api\UserTests.cs" />
     <Compile Include="Api\ProjectTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

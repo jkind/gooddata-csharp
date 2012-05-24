@@ -1,8 +1,8 @@
-﻿using GoodDataService;
+﻿using GoodDataService.SSO;
 using NUnit.Framework;
 using Starksoft.Cryptography.OpenPGP;
 
-namespace GoodDataTests
+namespace GoodDataTests.SSO
 {
 	[TestFixture]
 	public class SsoTests

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Web;
+using GoodDataService.Configuration;
 
-namespace GoodDataService
+namespace GoodDataService.SSO
 {
 	public class SsoProvider
 	{

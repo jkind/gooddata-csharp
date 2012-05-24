@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using GoodDataService;
-using GoodDataService.Models;
+using GoodDataService.Api;
+using GoodDataService.Api.Models;
 using NUnit.Framework;
 
 namespace GoodDataTests.Api

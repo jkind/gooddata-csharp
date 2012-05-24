@@ -2,11 +2,11 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("GoodDataService")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A quick and easy-to-use c# sdk that wraps access to GoodData APIs. It handles single-signon integration as well as most of the common gooddata rest api methods.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Kindproject llc")]
 [assembly: AssemblyProduct("GoodDataService")]
-[assembly: AssemblyCopyright("Copyright ©  2012")]
+[assembly: AssemblyCopyright("Copyright © 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]

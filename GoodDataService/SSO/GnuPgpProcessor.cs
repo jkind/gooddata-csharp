@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using Starksoft.Cryptography.OpenPGP;
 
-namespace GoodDataService
+namespace GoodDataService.SSO
 {
 	/// <summary>
 	/// </summary>

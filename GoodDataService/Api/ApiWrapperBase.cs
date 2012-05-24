@@ -7,11 +7,12 @@ using System.Net.Security;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using GoodDataService.Models;
+using GoodDataService.Configuration;
+using GoodDataService.Api.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace GoodDataService
+namespace GoodDataService.Api
 {
 	public class ApiWrapperBase
 	{
@@ -127,7 +128,7 @@ namespace GoodDataService
 					using (var data = exceptionResponse.GetResponseStream())
 					{
 						var text = new StreamReader(data).ReadToEnd();
-						var errorResponse = JsonConvert.DeserializeObject(text, typeof (ErrorDto)) as ErrorDto;
+						var errorResponse = JsonConvert.DeserializeObject(text, typeof (ErrorResponse)) as ErrorResponse;
 						Trace.WriteLine(errorResponse.Error.Message);
 						throw new GoodDataApiException(errorResponse.Error.Message);
 					}

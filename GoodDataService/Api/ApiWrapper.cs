@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GoodDataService.Models;
+using GoodDataService.Api.Models;
 using Newtonsoft.Json;
 
-namespace GoodDataService
+namespace GoodDataService.Api
 {
 	public class ApiWrapper : ApiWrapperBase
 	{
@@ -13,7 +13,7 @@ namespace GoodDataService
 		public string CreateProject(string title, string summary, string template = null)
 		{
 			var url = string.Concat(Config.Url, Constants.PROJECTS_URI);
-			var payload = new ProjectDto
+			var payload = new ProjectResponse
 			              	{
 			              		Project = new Project
 			              		          	{
@@ -34,12 +34,12 @@ namespace GoodDataService
 			return projectResponse.Uri.ExtractId(Constants.PROJECTS_URI);
 		}
 
-		public List<ProjectDto> GetProjects()
+		public List<ProjectResponse> GetProjects()
 		{
-			var list = new List<ProjectDto>();
+			var list = new List<ProjectResponse>();
 			var url = string.Concat(Config.Url, Constants.PROFILE_URI, "/", ProfileId, "/projects");
 			var response = GetRequest(url);
-			var projectResponse = JsonConvert.DeserializeObject(response, typeof (ProjectsDto)) as ProjectsDto;
+			var projectResponse = JsonConvert.DeserializeObject(response, typeof (ProjectsResponse)) as ProjectsResponse;
 			if (projectResponse != null)
 			{
 				list.AddRange(projectResponse.Projects);
@@ -65,13 +65,13 @@ namespace GoodDataService
 
 		#region Export/Import
 
-		public string ExportReport(string projectId, FormatTypes formatType, string reportUri)
+		public string ExportReport(string projectId, ExportFormatTypes exportFormatType, string reportUri)
 		{
 			var url = string.Concat(Config.Url, projectId, Constants.EXPORT_EXECUTOR);
 
 			var payload = new ExportReportRequest
 			              	{
-			              		Result_Req = new ResultRequest(formatType)
+			              		Result_Req = new ResultRequest(exportFormatType)
 			              		             	{
 			              		             		Report = reportUri
 			              		             	}
@@ -316,7 +316,7 @@ namespace GoodDataService
 		{
 			var url = string.Concat(Config.Url, objectLink);
 			var response = GetRequest(url);
-			return JsonConvert.DeserializeObject<dynamic>(response);
+			return JsonConvert.DeserializeObject<object>(response);
 		}
 
 		public List<Entry> Query(string projectId, ObjectTypes objectTypes)

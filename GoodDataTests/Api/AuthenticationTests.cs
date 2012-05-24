@@ -1,4 +1,5 @@
 ﻿using GoodDataService;
+using GoodDataService.Api;
 using NUnit.Framework;
 
 namespace GoodDataTests.Api
