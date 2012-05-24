@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using GoodDataService;
 using NUnit.Framework;
 
@@ -9,26 +7,73 @@ namespace GoodDataTests.Api
 {
 	public class QueryTests
 	{
-		private readonly GoodDataService.ApiWrapper reportingService;
+		private ApiWrapper _reportingService;
 
-		public QueryTests()
+		[SetUp]
+		public void Setup()
 		{
-			reportingService = new GoodDataService.ApiWrapper();
+			_reportingService = new ApiWrapper();
 		}
+
 		[Test]
-		public void GetReportTests()
+		public void GetReportTest()
 		{
-			var project= reportingService.FindProjectByTitle(reportingService.Config.Domain);
-			var reports = reportingService.Query(project.ProjectId, QueryTypes.Report);
+			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
+			var reports = _reportingService.Query(project.ProjectId, ObjectTypes.Report);
 			Assert.IsNotNull(reports);
 		}
 
 		[Test]
-		public void GetDashboardsTests()
+		public void GetDashboardsTest()
 		{
-			var project = reportingService.FindProjectByTitle(reportingService.Config.Domain);
-			var reports = reportingService.Query(project.ProjectId, QueryTypes.Dashboard);
+			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
+			var reports = _reportingService.Query(project.ProjectId, ObjectTypes.Dashboard);
 			Assert.IsNotNull(reports);
+		}
+
+		[Test]
+		public void GetMetricsTest()
+		{
+			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
+			var reports = _reportingService.Query(project.ProjectId, ObjectTypes.Metric);
+			Assert.IsNotNull(reports);
+		}
+
+		[Test]
+		public void GetProjectReportFullObjectsTest()
+		{
+			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
+			var items = _reportingService.GetFullObjects(project.ProjectId, ObjectTypes.Report);
+			Assert.IsNotNull(items);
+			Assert.IsNotNullOrEmpty(items[0].Identifier);
+			Assert.IsNotNullOrEmpty(items[0].Title);
+			Assert.IsNotNull(items[0].Summary);
+		}
+
+		[Test]
+		public void GetProjectDashboardFullObjectsTest()
+		{
+			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
+			var items = _reportingService.GetFullObjects(project.ProjectId, ObjectTypes.Dashboard);
+			Assert.IsNotNull(items);
+			Assert.IsNotNullOrEmpty(items[0].Identifier);
+			Assert.IsNotNullOrEmpty(items[0].Title);
+			Assert.IsNotNull(items[0].Summary);
+		}
+
+		[Test]
+		public void GetDashboardReportsTest()
+		{
+			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
+			var items = _reportingService.Query(project.ProjectId, ObjectTypes.Dashboard);
+			foreach (var item in items)
+			{
+				var usingReponse = _reportingService.GetDependancies(project.ProjectId, item.ObjectId, true);
+				Assert.IsNotNull(usingReponse);
+				var reports =
+					usingReponse.Using.Nodes.Where(x => x.Category.Equals("report", StringComparison.OrdinalIgnoreCase)).ToList();
+				Assert.GreaterOrEqual(reports.Count, 1);
+			}
 		}
 	}
 }

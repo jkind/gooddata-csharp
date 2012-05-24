@@ -11,6 +11,7 @@ namespace GoodDataService
 	public class GnuPgpProcessor
 	{
 		private readonly GnuPG gpg;
+
 		public GnuPgpProcessor()
 		{
 			gpg = new GnuPG();

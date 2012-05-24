@@ -9,6 +9,12 @@ namespace GoodDataService
 			return value.Replace(replacePath, string.Empty).Replace("/", string.Empty);
 		}
 
+		public static string ExtractObjectId(this string value)
+		{
+			var startIndex = value.LastIndexOf('/') + 1;
+			return value.Substring(startIndex, value.Length - startIndex);
+		}
+
 		/// <summary>
 		/// 	Use Universal time.
 		/// </summary>

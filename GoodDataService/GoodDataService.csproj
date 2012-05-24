@@ -48,10 +48,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiWrapper.cs" />
-    <Compile Include="GnuPgpProcessor.cs" />
+    <Compile Include="Api\ApiWrapper.cs" />
+    <Compile Include="Api\ApiWrapperBase.cs" />
+    <Compile Include="SSO\GnuPgpProcessor.cs" />
+    <Compile Include="Api\Constants.cs" />
+    <Compile Include="Api\Enums.cs" />
+    <Compile Include="Models\ExportRequest.cs" />
     <Compile Include="Models\ProjectUserRequest.cs" />
-    <Compile Include="Configuration\GoodDataConfigurationSection.cs" />
+    <Compile Include="Models\Configuration\GoodDataConfigurationSection.cs" />
     <Compile Include="Models\CreateDomainUser.cs" />
     <Compile Include="Models\ErrorDto.cs" />
     <Compile Include="Models\GoodDataApiException.cs" />
@@ -60,9 +64,12 @@
     <Compile Include="Models\AuthenticationResponse.cs" />
     <Compile Include="Models\UriResponse.cs" />
     <Compile Include="Models\UserResponse.cs" />
+    <Compile Include="Models\ObjectMeta.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SSOProvider.cs" />
+    <Compile Include="Models\QueryResponse.cs" />
+    <Compile Include="SSO\SSOProvider.cs" />
     <Compile Include="StringExtension.cs" />
+    <Compile Include="Models\UsingResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

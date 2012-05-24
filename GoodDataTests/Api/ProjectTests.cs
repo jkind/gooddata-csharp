@@ -1,4 +1,5 @@
 ﻿using System;
+using GoodDataService;
 using NUnit.Framework;
 
 namespace GoodDataTests.Api
@@ -6,11 +7,22 @@ namespace GoodDataTests.Api
 	[TestFixture]
 	public class ProjectTests
 	{
-		private readonly GoodDataService.ApiWrapper reportingService;
+		private readonly ApiWrapper reportingService;
 
 		public ProjectTests()
 		{
-			reportingService = new GoodDataService.ApiWrapper();
+			reportingService = new ApiWrapper();
+		}
+
+		[Test]
+		[Ignore]
+		public void CreateProject()
+		{
+			var title = reportingService.Config.Domain + "Tester";
+			var projectId = reportingService.CreateProject(title, "Summary " + title);
+
+			var projects = reportingService.FindProjectByTitle(title);
+			Assert.NotNull(projects);
 		}
 
 		[Test]
@@ -31,17 +43,6 @@ namespace GoodDataTests.Api
 
 		[Test]
 		[Ignore]
-		public void CreateProject()
-		{
-			var title = reportingService.Config.Domain + "Tester";
-			var projectId = reportingService.CreateProject(title, "Summary " + title);
-
-			var projects = reportingService.FindProjectByTitle(title);
-			Assert.NotNull(projects);
-		}
-
-		[Test]
-		[Ignore]
 		public void DeleteProject()
 		{
 			var title = reportingService.Config.Domain + "Tester";
@@ -53,6 +54,27 @@ namespace GoodDataTests.Api
 			Assert.IsNull(projects);
 		}
 
-		
+		[Test]
+		public void ExportPartials_ExpectSucces()
+		{
+			var title = reportingService.Config.Domain;
+			var project = reportingService.FindProjectByTitle(title);
+			Assert.NotNull(project);
+
+			var uris = reportingService.GetQueryLinks(project.ProjectId, ObjectTypes.Dashboard);
+			var response = reportingService.ExportPartials(project.ProjectId, uris);
+			Assert.NotNull(response);
+		}
+
+		[Test]
+		public void ExportProject_ExpectSucces()
+		{
+			var title = reportingService.Config.Domain;
+			var project = reportingService.FindProjectByTitle(title);
+			Assert.NotNull(project);
+
+			var response = reportingService.ExportProject(project.ProjectId, false, true);
+			Assert.NotNull(response);
+		}
 	}
 }

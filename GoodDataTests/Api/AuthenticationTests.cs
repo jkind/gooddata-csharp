@@ -1,15 +1,16 @@
-﻿using NUnit.Framework;
+﻿using GoodDataService;
+using NUnit.Framework;
 
 namespace GoodDataTests.Api
 {
 	[TestFixture]
 	public class AuthenticationTests
 	{
-		private readonly GoodDataService.ApiWrapper reportingService;
+		private readonly ApiWrapper reportingService;
 
 		public AuthenticationTests()
 		{
-			reportingService = new GoodDataService.ApiWrapper();
+			reportingService = new ApiWrapper();
 		}
 
 		[Test]

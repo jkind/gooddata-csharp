@@ -19,7 +19,7 @@ namespace GoodDataService.Models
 		[JsonIgnore]
 		public string ProfileId
 		{
-			get { return Links.Self.ExtractId(ApiWrapper.PROFILE_URI); }
+			get { return Links.Self.ExtractId(Constants.PROFILE_URI); }
 		}
 
 		public UserContent Content { get; set; }

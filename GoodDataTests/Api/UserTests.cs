@@ -17,37 +17,70 @@ namespace GoodDataTests.Api
 		}
 
 		[Test]
-		public void GetDomainUsers_ExpectSucces()
+		[Ignore]
+		public void AddUserToProjectUserIsInProject(string email)
 		{
-			var users = reportingService.GetDomainUsers();
-			Assert.IsNotInstanceOf<List<AccountSetting>>(typeof (List<AccountSetting>));
-			Assert.IsNotEmpty(users);
+			var project = reportingService.FindProjectByTitle(reportingService.Config.Domain);
+			var user = reportingService.FindProjectUsersByEmail(project.ProjectId, email);
+			Assert.NotNull(user);
+			Assert.IsTrue(user.Content.Status == "ENABLED");
+			Assert.IsTrue(user.Content.Email == email);
 		}
 
 		[Test]
-		public void GetProjectUsers_ExpectSucces()
+		[Ignore]
+		public void AddUsertoProject()
 		{
-			var projectId = reportingService.CreateProject("ProjectUserTest", "Project User Test Summary");
-			var domainUsers = reportingService.GetDomainUsers();
-			var max = Math.Min(domainUsers.Count, 2);
-			for (int i = 0; i < max; i++)
-			{
-				reportingService.AddUsertoProject(projectId, domainUsers[i].AccountSetting.ProfileId);
-			}
-			var users = reportingService.GetProjectUsers(projectId);
-			if (users==null)
-				
-			Assert.IsNotInstanceOf<List<AccountSetting>>(typeof (List<AccountSetting>));
-			Assert.IsNotEmpty(users);
+			var projectName = reportingService.Config.Domain;
+			var project = reportingService.FindProjectByTitle(projectName);
+			var email = string.Format("gooddata@{0}.com", projectName);
+			var domainUser = reportingService.FindDomainUsersByLogin(email);
+			var projectUser = reportingService.FindProjectUsersByEmail(project.ProjectId, email);
+			reportingService.AddUsertoProject(project.ProjectId, domainUser.ProfileId, Roles.Editor);
+		}
 
-			reportingService.DeleteProject(projectId);
+		[Test]
+		[Ignore]
+		public void CheckUserIsInDomain(string email)
+		{
+			var user = reportingService.FindDomainUsersByLogin(email);
+			Assert.IsTrue(user.Login == email);
+		}
+
+		[Test]
+		[Ignore]
+		public void CheckUserIsInProject(string email)
+		{
+			var project = reportingService.FindProjectByTitle(reportingService.Config.Domain);
+			var user = reportingService.FindProjectUsersByEmail(project.ProjectId, email);
+			Assert.NotNull(user);
+			Assert.IsTrue(user.Content.Status == "ENABLED");
+			Assert.IsTrue(user.Content.Email == email);
+		}
+
+		[Test]
+		[Ignore]
+		public void CreateUser()
+		{
+			var login = string.Format("ssotester@{0}.com", reportingService.Config.Domain);
+			var password = "password";
+			var firstName = "sso";
+			var lastName = "admin";
+
+			var newProfileId = reportingService.CreateUser(login, password, password, firstName, lastName);
+			Assert.IsNotNullOrEmpty(newProfileId);
+
+			var project = reportingService.FindProjectByTitle(reportingService.Config.Domain);
+			reportingService.AddUsertoProject(project.ProjectId, newProfileId, Roles.DashboardOnly);
+
+			CheckUserIsInProject(login);
 		}
 
 		[Test]
 		public void CreateUser_Integration_ExpectSucces()
 		{
 			var title = DateTime.Now.Ticks.ToString();
-			var login = string.Format("tester+{0}@{1}.com",title,reportingService.Config.Domain);
+			var login = string.Format("tester+{0}@{1}.com", title, reportingService.Config.Domain);
 			var password = "password";
 			var firstName = "firstname" + title;
 			var lastName = "lastName" + title;
@@ -76,13 +109,40 @@ namespace GoodDataTests.Api
 
 		[Test]
 		[Ignore]
-		public void AddUserToProjectUserIsInProject(string email)
+		public void DeleteUser(string email)
 		{
-			var project = reportingService.FindProjectByTitle(reportingService.Config.Domain);
-			var user = reportingService.FindProjectUsersByEmail(project.ProjectId, email);
-			Assert.NotNull(user);
-			Assert.IsTrue(user.Content.Status == "ENABLED");
-			Assert.IsTrue(user.Content.Email == email);
+			email = email ?? string.Format("ssotester@{0}.com", reportingService.Config.Domain);
+			var user = reportingService.FindDomainUsersByLogin(email);
+			reportingService.DeleteUser(user.ProfileId);
+			user = reportingService.FindDomainUsersByLogin(email);
+			Assert.IsNull(user);
+		}
+
+		[Test]
+		public void GetDomainUsers_ExpectSucces()
+		{
+			var users = reportingService.GetDomainUsers();
+			Assert.IsNotInstanceOf<List<AccountSetting>>(typeof (List<AccountSetting>));
+			Assert.IsNotEmpty(users);
+		}
+
+		[Test]
+		public void GetProjectUsers_ExpectSucces()
+		{
+			var projectId = reportingService.CreateProject("ProjectUserTest", "Project User Test Summary");
+			var domainUsers = reportingService.GetDomainUsers();
+			var max = Math.Min(domainUsers.Count, 2);
+			for (int i = 0; i < max; i++)
+			{
+				reportingService.AddUsertoProject(projectId, domainUsers[i].AccountSetting.ProfileId);
+			}
+			var users = reportingService.GetProjectUsers(projectId);
+			if (users == null)
+
+				Assert.IsNotInstanceOf<List<AccountSetting>>(typeof (List<AccountSetting>));
+			Assert.IsNotEmpty(users);
+
+			reportingService.DeleteProject(projectId);
 		}
 
 		[Test]
@@ -98,68 +158,6 @@ namespace GoodDataTests.Api
 			Assert.IsTrue(user.Content.Status == "DISABLED");
 			Assert.IsTrue(user.Content.Email == email);
 			reportingService.UpdateProjectUserStatus(project.ProjectId, user.ProfileId, true);
-		}
-
-
-		[Test]
-		[Ignore]
-		public void CheckUserIsInProject(string email)
-		{
-			var project = reportingService.FindProjectByTitle(reportingService.Config.Domain);
-			var user = reportingService.FindProjectUsersByEmail(project.ProjectId, email);
-			Assert.NotNull(user);
-			Assert.IsTrue(user.Content.Status == "ENABLED");
-			Assert.IsTrue(user.Content.Email == email);
-		}
-
-		[Test]
-		[Ignore]
-		public void CheckUserIsInDomain(string email)
-		{
-			var user = reportingService.FindDomainUsersByLogin(email);
-			Assert.IsTrue(user.Login == email);
-		}
-
-		[Test]
-		[Ignore]
-		public void CreateUser()
-		{
-			//var login = string.Format("ssotester@{0}.com", reportingService.Config.Domain);
-			var login = string.Format("jkind+admin@{0}.com", reportingService.Config.Domain);
-			var password = "password";
-			var firstName = "sso";
-			var lastName = "admin";
-
-			var newProfileId = reportingService.CreateUser(login, password, password, firstName, lastName);
-			Assert.IsNotNullOrEmpty(newProfileId);
-
-			var project = reportingService.FindProjectByTitle( reportingService.Config.Domain);
-			reportingService.AddUsertoProject(project.ProjectId, newProfileId, Roles.DashboardOnly);
-
-			CheckUserIsInProject(login);
-		}
-
-		[Test]
-		[Ignore]
-		public void DeleteUser(string email)
-		{
-			email = email ?? string.Format("ssotester@{0}.com", reportingService.Config.Domain);
-			var user = reportingService.FindDomainUsersByLogin(email);
-			reportingService.DeleteUser(user.ProfileId);
-			user = reportingService.FindDomainUsersByLogin(email);
-			Assert.IsNull(user);
-		}
-
-		[Test]
-		[Ignore]
-		public void AddUsertoProject()
-		{
-			var project = reportingService.FindProjectByTitle( reportingService.Config.Domain);
-			//var email = string.Format("ssotester@{0}.com", reportingService.Config.Domain);
-			var email = string.Format("jkind+admin@{0}.com", reportingService.Config.Domain);
-			var domainUser = reportingService.FindDomainUsersByLogin(email);
-			var projectUser = reportingService.FindProjectUsersByEmail(project.ProjectId,email);
-			reportingService.AddUsertoProject(project.ProjectId, domainUser.ProfileId, Roles.Editor);
 		}
 	}
 }

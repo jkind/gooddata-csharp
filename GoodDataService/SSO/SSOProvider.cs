@@ -6,12 +6,12 @@ namespace GoodDataService
 {
 	public class SsoProvider
 	{
-		public GoodDataConfigurationSection Config { get; set; }
-
 		public SsoProvider()
 		{
 			Config = GoodDataConfigurationSection.GetConfig();
 		}
+
+		public GoodDataConfigurationSection Config { get; set; }
 
 		public string GenerateToken(string email, int validaityOffsetInMinutes = 10)
 		{
@@ -29,7 +29,7 @@ namespace GoodDataService
 		private static string CreateUserData(string email, int validaityOffsetInMinutes = 10)
 		{
 			return "{\"email\":\"" + email + "\",\"validity\":" +
-				   Math.Round(DateTime.UtcNow.AddMinutes(validaityOffsetInMinutes).ToUnixTime()) + "}";
+			       Math.Round(DateTime.UtcNow.AddMinutes(validaityOffsetInMinutes).ToUnixTime()) + "}";
 		}
 
 		private static string EncodeUserData(string input)

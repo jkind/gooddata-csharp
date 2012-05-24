@@ -19,7 +19,7 @@ namespace GoodDataService.Models
 		[JsonIgnore]
 		public string ProjectId
 		{
-			get { return Links.Metadata.ExtractId(ApiWrapper.MD_URI); }
+			get { return Links.Metadata.ExtractId(Constants.MD_URI); }
 		}
 
 		public ProjectContent Content { get; set; }
