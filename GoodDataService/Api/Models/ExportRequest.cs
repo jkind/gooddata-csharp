@@ -70,10 +70,24 @@ namespace GoodDataService.Api.Models
 
 	public class ExportReportRequest
 	{
-		public ResultRequest Result_Req { get; set; }
+		public ResultRequest result_req { get; set; }
 	}
 
-	
+	public class ExecuteReportRequest
+	{
+		public ExecuteResult report_req { get; set; }
+	}
+
+	public class ExecuteResult
+	{
+		public ExecuteResult(ExportFormatTypes exportFormatType)
+		{
+			Format = Enum.GetName(typeof (ExportFormatTypes), exportFormatType);
+		}
+
+		public string Report { get; set; }
+		public string Format { get; private set; }
+	}
 
 	public class ResultRequest
 	{

@@ -133,7 +133,7 @@ namespace GoodDataTests.Api
 			var projectId = reportingService.CreateProject("ProjectUserTest", "Project User Test Summary");
 			var domainUsers = reportingService.GetDomainUsers();
 			var max = Math.Min(domainUsers.Count, 2);
-			for (int i = 0; i < max; i++)
+			for (var i = 0; i < max; i++)
 			{
 				reportingService.AddUsertoProject(projectId, domainUsers[i].AccountSetting.ProfileId);
 			}

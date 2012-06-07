@@ -16,9 +16,9 @@
 
 	public enum ExportFormatTypes
 	{
-		PDF,
-		CSV,
-		PNG,
-		XLS
+		pdf,
+		csv,
+		png,
+		xls
 	}
 }

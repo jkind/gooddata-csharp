@@ -7,8 +7,8 @@ using System.Net.Security;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using GoodDataService.Configuration;
 using GoodDataService.Api.Models;
+using GoodDataService.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -92,6 +92,44 @@ namespace GoodDataService.Api
 			MakeRequest(url, "DELETE", null);
 		}
 
+		public byte[] DownloadFile(string url)
+		{
+			using (var client = new WebClient())
+			{
+				return client.DownloadData(url);
+			}
+		}
+
+		public WebResponse GetFileResponse(string url)
+		{
+			var webRequest = WebRequest.Create(url) as HttpWebRequest;
+			// allows for skipping validation warnings such as from self-signed certs
+			ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
+
+			if (webRequest != null)
+			{
+				SetupRequest(webRequest, "GET");
+			}
+
+			try
+			{
+				return webRequest.GetResponse();
+			}
+			catch (WebException ex)
+			{
+				using (var exceptionResponse = ex.Response)
+				{
+					var httpResponse = (HttpWebResponse) exceptionResponse;
+					Trace.WriteLine(string.Format("Error code: {0}", httpResponse.StatusCode));
+					using (var data = exceptionResponse.GetResponseStream())
+					{
+						var text = new StreamReader(data).ReadToEnd();
+						throw new GoodDataApiException(text);
+					}
+				}
+			}
+		}
+
 		private string MakeRequest(string url, string method, object postData)
 		{
 			var webRequest = WebRequest.Create(url) as HttpWebRequest;
@@ -128,9 +166,7 @@ namespace GoodDataService.Api
 					using (var data = exceptionResponse.GetResponseStream())
 					{
 						var text = new StreamReader(data).ReadToEnd();
-						var errorResponse = JsonConvert.DeserializeObject(text, typeof (ErrorResponse)) as ErrorResponse;
-						Trace.WriteLine(errorResponse.Error.Message);
-						throw new GoodDataApiException(errorResponse.Error.Message);
+						throw new GoodDataApiException(text);
 					}
 				}
 			}
@@ -174,8 +210,11 @@ namespace GoodDataService.Api
 			var keys = new ArrayList(table.Keys);
 			foreach (var key in keys)
 			{
-				var newKey = ((string) key).Substring(1);
-				table[newKey] = table[key];
+				if (!string.IsNullOrEmpty((string)key))
+				{
+					var newKey = ((string) key).Substring(1);
+					table[newKey] = table[key];
+				}
 			}
 
 			webRequest.Method = method.ToUpper();

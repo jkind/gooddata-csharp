@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using GoodDataService.Api.Models;
 using Newtonsoft.Json;
 
@@ -65,15 +66,33 @@ namespace GoodDataService.Api
 
 		#region Export/Import
 
-		public string ExportReport(string projectId, ExportFormatTypes exportFormatType, string reportUri)
+		public string ExecuteReport(string reportUri, ExportFormatTypes exportFormatType = ExportFormatTypes.csv)
 		{
-			var url = string.Concat(Config.Url, projectId, Constants.EXPORT_EXECUTOR);
+			var url = string.Concat(Config.Url, Constants.EXECUTOR);
+
+			var payload = new ExecuteReportRequest
+			              	{
+			              		report_req = new ExecuteResult(exportFormatType)
+			              		             	{
+			              		             		Report = reportUri
+			              		             	}
+			              	};
+			var response = PostRequest(url, payload);
+			dynamic exportResponse = JsonConvert.DeserializeObject<object>(response);
+			return exportResponse.reportResult2.meta.uri;
+		}
+
+		public string ExportReport(string reportUri, ExportFormatTypes exportFormatType = ExportFormatTypes.csv)
+		{
+			var executeUri = ExecuteReport(reportUri);
+
+			var url = string.Concat(Config.Url, Constants.EXPORT_EXECUTOR);
 
 			var payload = new ExportReportRequest
 			              	{
-			              		Result_Req = new ResultRequest(exportFormatType)
+			              		result_req = new ResultRequest(exportFormatType)
 			              		             	{
-			              		             		Report = reportUri
+			              		             		Report = executeUri
 			              		             	}
 			              	};
 			var response = PostRequest(url, payload);
@@ -155,6 +174,28 @@ namespace GoodDataService.Api
 			var response = GetRequest(url);
 			var taskResponse = JsonConvert.DeserializeObject(response, typeof (TaskResponse)) as TaskResponse;
 			return (taskResponse.TaskState.Status == Enum.GetName(typeof (TaskStates), TaskStates.OK));
+		}
+
+		public WebResponse GetFile(string uri)
+		{
+			var url = string.Concat(Config.Url, uri);
+			return GetFileResponse(url);
+		}
+
+		public byte[] GetFileContents(WebResponse response)
+		{
+			using (var stream = response.GetResponseStream())
+			{
+				var buffer = new byte[int.Parse(response.Headers["Content-Length"])];
+				var bytesRead = 0;
+				var totalBytesRead = bytesRead;
+				while (totalBytesRead < buffer.Length)
+				{
+					bytesRead = stream.Read(buffer, bytesRead, buffer.Length - bytesRead);
+					totalBytesRead += bytesRead;
+				}
+				return buffer;
+			}
 		}
 
 		#endregion
