@@ -9,10 +9,20 @@ namespace GoodDataService.Api
 {
 	public class ApiWrapper : ApiWrapperBase
 	{
+		private void CheckAuthentication()
+		{
+			if (CookieJar.Count == 0)
+			{
+				Authenticate(Config.Login, Config.Password);
+				GetToken();
+			}
+		}
+
 		#region Project
 
 		public string CreateProject(string title, string summary, string template = null)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.PROJECTS_URI);
 			var payload = new ProjectResponse
 			              	{
@@ -37,6 +47,7 @@ namespace GoodDataService.Api
 
 		public List<ProjectResponse> GetProjects()
 		{
+			CheckAuthentication();
 			var list = new List<ProjectResponse>();
 			var url = string.Concat(Config.Url, Constants.PROFILE_URI, "/", ProfileId, "/projects");
 			var response = GetRequest(url);
@@ -50,6 +61,7 @@ namespace GoodDataService.Api
 
 		public void DeleteProject(string projectId)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId);
 			DeleteRequest(url);
 		}
@@ -68,6 +80,7 @@ namespace GoodDataService.Api
 
 		public string ExecuteReport(string reportUri, ExportFormatTypes exportFormatType = ExportFormatTypes.csv)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.EXECUTOR);
 
 			var payload = new ExecuteReportRequest
@@ -84,6 +97,7 @@ namespace GoodDataService.Api
 
 		public string ExportReport(string reportUri, ExportFormatTypes exportFormatType = ExportFormatTypes.csv)
 		{
+			CheckAuthentication();
 			var executeUri = ExecuteReport(reportUri);
 
 			var url = string.Concat(Config.Url, Constants.EXPORT_EXECUTOR);
@@ -102,6 +116,7 @@ namespace GoodDataService.Api
 
 		public ExportArtifact ExportProject(string projectId, bool exportUsers = false, bool exportData = false)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_EXPORT_URI);
 
 			var payload = new ExportRequest
@@ -119,6 +134,7 @@ namespace GoodDataService.Api
 
 		public ExportArtifact ExportPartials(string projectId, List<string> uris)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_PARTIAL_EXPORT_URI);
 
 			var payload = new PartialExportRequest
@@ -135,6 +151,7 @@ namespace GoodDataService.Api
 
 		public string ImportProject(string projectId, string token)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_IMPORT_URI);
 
 			var payload = new ImportRequest
@@ -152,6 +169,7 @@ namespace GoodDataService.Api
 		public string ImportPartials(string projectId, string token, bool overwriteNewer = false,
 		                             bool updateLdmObjects = false)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_PARTIAL_IMPORT_URI);
 
 			var payload = new PartialImportRequest
@@ -170,6 +188,7 @@ namespace GoodDataService.Api
 
 		public bool PollStatus(string uri)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, uri);
 			var response = GetRequest(url);
 			var taskResponse = JsonConvert.DeserializeObject(response, typeof (TaskResponse)) as TaskResponse;
@@ -204,6 +223,7 @@ namespace GoodDataService.Api
 
 		public string CreateUser(string login, string password, string verfiyPassword, string firstName, string lastName)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.DOMAIN_URI, "/", Config.Domain, Constants.DOMAIN_USERS_SUFFIX);
 			var payload = new CreateDomainUser
 			              	{
@@ -223,6 +243,7 @@ namespace GoodDataService.Api
 
 		public void AddUsertoProject(string projectId, string userId, Roles role = Roles.DashboardOnly)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.PROJECT_USERS_SUFFIX);
 			var payload = new ProjectUserRequest
 			              	{
@@ -249,6 +270,7 @@ namespace GoodDataService.Api
 
 		public void UpdateProjectUserStatus(string projectId, string profileId, bool enabled)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.PROJECT_USERS_SUFFIX);
 			var payload = new ProjectUserRequest
 			              	{
@@ -269,6 +291,7 @@ namespace GoodDataService.Api
 
 		public List<AccountResponseSettingWrapper> GetDomainUsers(string domain = "")
 		{
+			CheckAuthentication();
 			if (string.IsNullOrEmpty(domain))
 				domain = Config.Domain;
 			var list = new List<AccountResponseSettingWrapper>();
@@ -285,6 +308,7 @@ namespace GoodDataService.Api
 
 		public List<UserWrapper> GetProjectUsers(string projectId)
 		{
+			CheckAuthentication();
 			var list = new List<UserWrapper>();
 			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.DOMAIN_USERS_SUFFIX);
 			var response = GetRequest(url);
@@ -314,6 +338,7 @@ namespace GoodDataService.Api
 
 		public void DeleteUser(string profileId)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.PROFILE_URI, "/", profileId);
 			DeleteRequest(url);
 		}
@@ -324,6 +349,7 @@ namespace GoodDataService.Api
 
 		public IdentifiersResponse GetUris(string projectId, List<string> identifiers)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, projectId, Constants.IDENTIFIER_URI);
 
 			var payload = identifiers;
@@ -333,6 +359,7 @@ namespace GoodDataService.Api
 
 		public UsingResponse GetDependancies(string projectId, string objectId, bool? filterByReport = null)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, "/using/", objectId);
 			var response = GetRequest(url);
 			var usingResponse = JsonConvert.DeserializeObject(response, typeof (UsingResponse)) as UsingResponse;
@@ -355,6 +382,7 @@ namespace GoodDataService.Api
 
 		public dynamic GetObject(string objectLink)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, objectLink);
 			var response = GetRequest(url);
 			return JsonConvert.DeserializeObject<object>(response);
@@ -362,6 +390,7 @@ namespace GoodDataService.Api
 
 		public List<Entry> Query(string projectId, ObjectTypes objectTypes)
 		{
+			CheckAuthentication();
 			var fragment = Constants.REPORT_QUERY;
 			if (objectTypes == ObjectTypes.Dashboard)
 				fragment = Constants.DASHBOARD_QUERY;

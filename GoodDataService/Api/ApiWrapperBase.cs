@@ -22,16 +22,7 @@ namespace GoodDataService.Api
 		{
 			Config = GoodDataConfigurationSection.GetConfig();
 			CookieJar = new CookieContainer();
-			Authenticate(Config.Login, Config.Password);
-			GetToken();
-		}
-
-		public ApiWrapperBase(string userName, string password)
-		{
-			Config = GoodDataConfigurationSection.GetConfig();
-			CookieJar = new CookieContainer();
-			Authenticate(userName, password);
-			GetToken();
+			
 		}
 
 		public string ProfileId { get; set; }
