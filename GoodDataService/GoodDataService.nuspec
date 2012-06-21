@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.0.1.3</version>
+    <version>1.0.1.4</version>
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
     <projectUrl>https://github.com/jkind/gooddata-csharp</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Updated namespaces. Added metadata api calls.</releaseNotes>
+    <releaseNotes>Fixed bug with role enums</releaseNotes>
     <copyright>Copyright 2012</copyright>
   </metadata>
 </package>

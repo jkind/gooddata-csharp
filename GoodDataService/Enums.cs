@@ -2,9 +2,10 @@
 {
 	public enum Roles
 	{
-		Admin,
-		Editor,
-		DashboardOnly
+		Admin=1,
+		Editor=2,
+		DashboardOnly=3,
+		Viewer = 5
 	}
 
 	public enum ObjectTypes
