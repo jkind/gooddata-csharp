@@ -2,14 +2,15 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.0.1.5</version>
+    <version>1.0.1.6</version>
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
     <projectUrl>https://github.com/jkind/gooddata-csharp</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Changed code to check authentication with every api call instead of auto authentication on ApiWrapper constructor.</releaseNotes>
+    <releaseNotes>Add ssoprovider property for CreateUser method.
+				  Fixed bug where GetFile was not checking for Authentication.</releaseNotes>
     <copyright>Copyright 2012</copyright>
   </metadata>
 </package>

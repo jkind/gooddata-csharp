@@ -38,6 +38,7 @@ namespace GoodDataService.Api.Models
 		public string PhoneNumber { get; set; }
 		public string Position { get; set; }
 		public string Timezone { get; set; }
+		public string SsoProvider { get; set; }
 		public AccountSettingLinks Links { get; set; }
 		public DateTime? Created { get; set; }
 		public DateTime? Updated { get; set; }

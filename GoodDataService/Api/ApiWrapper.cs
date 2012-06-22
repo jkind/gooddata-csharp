@@ -197,12 +197,14 @@ namespace GoodDataService.Api
 
 		public WebResponse GetFile(string uri)
 		{
+			CheckAuthentication();
 			var url = string.Concat(Config.Url, uri);
 			return GetFileResponse(url);
 		}
 
 		public byte[] GetFileContents(WebResponse response)
 		{
+			CheckAuthentication();
 			using (var stream = response.GetResponseStream())
 			{
 				var buffer = new byte[int.Parse(response.Headers["Content-Length"])];
@@ -221,7 +223,7 @@ namespace GoodDataService.Api
 
 		#region User
 
-		public string CreateUser(string login, string password, string verfiyPassword, string firstName, string lastName)
+		public string CreateUser(string login, string password, string verfiyPassword, string firstName, string lastName, string ssoProvider = "")
 		{
 			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.DOMAIN_URI, "/", Config.Domain, Constants.DOMAIN_USERS_SUFFIX);
@@ -233,7 +235,8 @@ namespace GoodDataService.Api
 			              		                 		Password = password,
 			              		                 		VerifyPassword = verfiyPassword,
 			              		                 		FirstName = firstName,
-			              		                 		LastName = lastName
+			              		                 		LastName = lastName,
+														SsoProvider = ssoProvider
 			              		                 	}
 			              	};
 			var response = PostRequest(url, payload);

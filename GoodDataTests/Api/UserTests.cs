@@ -109,6 +109,37 @@ namespace GoodDataTests.Api
 		}
 
 		[Test]
+		public void CreateSSOUser_Integration_ExpectSucces()
+		{
+			var title = DateTime.Now.Ticks.ToString();
+			var login = string.Format("tester+{0}@{1}.com", title, reportingService.Config.Domain);
+			var password = "password";
+			var firstName = "firstname" + title;
+			var lastName = "lastName" + title;
+			var newProfileId = reportingService.CreateUser(login, password, password, firstName, lastName, reportingService.Config.Domain);
+			Assert.IsNotNullOrEmpty(newProfileId);
+
+			var projectTitle = "CreateUserTest";
+			var projectId = reportingService.CreateProject(projectTitle, "Create User Test Summary");
+			reportingService.AddUsertoProject(projectId, newProfileId, Roles.Admin);
+
+			var user = reportingService.FindProjectUsersByEmail(projectId, login);
+			Assert.NotNull(user);
+			Assert.IsTrue(user.Content.Status == "ENABLED");
+			Assert.IsTrue(user.Content.Email == login);
+
+			reportingService.DeleteUser(newProfileId);
+
+			var domainUser = reportingService.FindDomainUsersByLogin(login);
+			Assert.IsNull(domainUser);
+
+			reportingService.DeleteProject(projectId);
+
+			var project = reportingService.FindProjectByTitle(projectTitle);
+			Assert.IsNull(project);
+		}
+
+		[Test]
 		[Ignore]
 		public void DeleteUser(string email)
 		{
