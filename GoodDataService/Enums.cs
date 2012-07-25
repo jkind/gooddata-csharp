@@ -1,18 +1,34 @@
 ﻿namespace GoodDataService
 {
-	public enum Roles
+	public class SystemRoles
 	{
-		Admin=1,
-		Editor=2,
-		DashboardOnly=3,
-		Viewer = 5
+		public const string Admin = "adminRole";
+		public const string Editor = "editorRole";
+		public const string DashboardOnly = "dashboardOnlyRole";
+		public const string Viewer = "readOnlyUserRole";
+	}
+
+	public class SystemPlatforms
+	{
+		public const string MySql = "mysql";
+		public const string PostGres = "Pg";
+	}
+
+	public enum ExpressionTypes
+	{
+		Equal,
+		NotEqual,
+		In,
+		NotIn
 	}
 
 	public enum ObjectTypes
 	{
 		Dashboard,
 		Report,
-		Metric
+		Metric,
+		Attribute,
+		UserFilter
 	}
 
 	public enum ExportFormatTypes

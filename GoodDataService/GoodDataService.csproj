@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-	<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -50,7 +50,14 @@
   <ItemGroup>
     <Compile Include="Api\ApiWrapper.cs" />
     <Compile Include="Api\ApiWrapperBase.cs" />
+    <Compile Include="Api\Models\AttributeResponse.cs" />
+    <Compile Include="Api\Models\AttributeElemntsResponse.cs" />
+    <Compile Include="Api\Models\AssignUserFilterRequest.cs" />
     <Compile Include="Api\Models\ImportRequest.cs" />
+    <Compile Include="Api\Models\RoleResponse.cs" />
+    <Compile Include="Api\Models\UserFilterRequest.cs" />
+    <Compile Include="Api\Models\RolesResponse.cs" />
+    <Compile Include="BoolConverter.cs" />
     <Compile Include="SSO\GnuPgpProcessor.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Enums.cs" />

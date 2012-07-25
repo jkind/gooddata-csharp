@@ -1,31 +1,43 @@
 ﻿using System;
-using GoodDataService.Api;
+using GoodDataService;
 using NUnit.Framework;
 
 namespace GoodDataTests.Api
 {
 	[TestFixture]
-	public class ProjectTests
+	public class ProjectTests : BaseTest
 	{
-		private readonly ApiWrapper reportingService;
-
-		public ProjectTests()
-		{
-			reportingService = new ApiWrapper();
-		}
 
 		[Test]
 		public void CreateProject_ExpectSucces()
 		{
 			var title = DateTime.Now.Ticks.ToString();
-			var projectId = reportingService.CreateProject(title, "Summary" + title);
+			var projectId = ReportingService.CreateProject(title, "Summary" + title);
 
-			var projects = reportingService.FindProjectByTitle(title);
+			var projects = ReportingService.FindProjectByTitle(title);
 			Assert.NotNull(projects);
+			Assert.AreEqual("Pg", projects.Content.Driver);
 
-			reportingService.DeleteProject(projectId);
+			ReportingService.DeleteProject(projectId);
 
-			projects = reportingService.FindProjectByTitle(title);
+			projects = ReportingService.FindProjectByTitle(title);
+
+			Assert.IsNull(projects);
+		}
+
+		[Test]
+		public void CreateProjectMySql_ExpectSucces()
+		{
+			var title = DateTime.Now.Ticks.ToString();
+			var projectId = ReportingService.CreateProject(title, "Summary" + title,null,SystemPlatforms.MySql);
+
+			var projects = ReportingService.FindProjectByTitle(title);
+			Assert.NotNull(projects);
+			Assert.AreEqual("mysql", projects.Content.Driver);
+
+			ReportingService.DeleteProject(projectId);
+
+			projects = ReportingService.FindProjectByTitle(title);
 
 			Assert.IsNull(projects);
 		}
@@ -34,10 +46,10 @@ namespace GoodDataTests.Api
 		[Ignore]
 		public void CreateProject()
 		{
-			var title = reportingService.Config.Domain + "Tester";
-			var projectId = reportingService.CreateProject(title, "Summary " + title);
+			var title = ReportingService.Config.Domain + "Tester";
+			var projectId = ReportingService.CreateProject(title, "Summary " + title);
 
-			var projects = reportingService.FindProjectByTitle(title);
+			var projects = ReportingService.FindProjectByTitle(title);
 			Assert.NotNull(projects);
 		}
 
@@ -45,11 +57,11 @@ namespace GoodDataTests.Api
 		[Ignore]
 		public void DeleteProject()
 		{
-			var title = reportingService.Config.Domain + "Tester";
-			var projects = reportingService.FindProjectByTitle(title);
-			reportingService.DeleteProject(projects.ProjectId);
+			var title = ReportingService.Config.Domain + "Tester";
+			var projects = ReportingService.FindProjectByTitle(title);
+			ReportingService.DeleteProject(projects.ProjectId);
 
-			projects = reportingService.FindProjectByTitle(title);
+			projects = ReportingService.FindProjectByTitle(title);
 
 			Assert.IsNull(projects);
 		}

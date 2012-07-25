@@ -49,6 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\AuthenticationTests.cs" />
+    <Compile Include="Api\BaseTest.cs" />
+    <Compile Include="Api\RoleTests.cs" />
     <Compile Include="Api\ExportTests.cs" />
     <Compile Include="Api\QueryTests.cs" />
     <Compile Include="SSO\SsoTests.cs" />

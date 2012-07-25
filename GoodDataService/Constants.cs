@@ -30,6 +30,8 @@
 		public static readonly string REPORT_QUERY = "/query/reports";
 		public static readonly string DASHBOARD_QUERY = "/query/projectdashboards";
 		public static readonly string METRICS_QUERY = "/query/metrics";
+		public static readonly string ATTRIBUTES_QUERY = "/query/attributes";
+		public static readonly string USERFILTER_QUERY = "/query/userfilters";
 		public static readonly string SLI_DESCRIPTOR_URI = "/descriptor";
 		public static readonly string TOKEN_URI = "/gdc/account/token";
 	}

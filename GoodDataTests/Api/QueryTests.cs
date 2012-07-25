@@ -1,50 +1,50 @@
 ﻿using System;
 using System.Linq;
 using GoodDataService;
-using GoodDataService.Api;
 using NUnit.Framework;
 
 namespace GoodDataTests.Api
 {
-	public class QueryTests
+	public class QueryTests : BaseTest
 	{
-		private ApiWrapper _reportingService;
-
-		[SetUp]
-		public void Setup()
+		public string TestProjectId { get; set; }
+		public QueryTests()
 		{
-			_reportingService = new ApiWrapper();
+			TestProjectId = GetTestProject().ProjectId;
 		}
 
 		[Test]
 		public void GetReportTest()
 		{
-			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
-			var reports = _reportingService.Query(project.ProjectId, ObjectTypes.Report);
-			Assert.IsNotNull(reports);
+			var items = ReportingService.Query(TestProjectId, ObjectTypes.Report);
+			Assert.IsNotNull(items);
 		}
 
 		[Test]
 		public void GetDashboardsTest()
 		{
-			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
-			var reports = _reportingService.Query(project.ProjectId, ObjectTypes.Dashboard);
-			Assert.IsNotNull(reports);
+			var items = ReportingService.Query(TestProjectId, ObjectTypes.Dashboard);
+			Assert.IsNotNull(items);
+		}
+
+		[Test]
+		public void GetUserFitlersTest()
+		{
+			var items = ReportingService.Query(TestProjectId, ObjectTypes.UserFilter);
+			Assert.IsNotNull(items);
 		}
 
 		[Test]
 		public void GetMetricsTest()
 		{
-			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
-			var reports = _reportingService.Query(project.ProjectId, ObjectTypes.Metric);
+			var reports = ReportingService.Query(TestProjectId, ObjectTypes.Metric);
 			Assert.IsNotNull(reports);
 		}
 
 		[Test]
 		public void GetProjectReportFullObjectsTest()
 		{
-			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
-			var items = _reportingService.GetFullObjects(project.ProjectId, ObjectTypes.Report);
+			var items = ReportingService.GetObjectMetaData(TestProjectId, ObjectTypes.Report);
 			Assert.IsNotNull(items);
 			Assert.IsNotNullOrEmpty(items[0].Identifier);
 			Assert.IsNotNullOrEmpty(items[0].Title);
@@ -54,8 +54,7 @@ namespace GoodDataTests.Api
 		[Test]
 		public void GetProjectDashboardFullObjectsTest()
 		{
-			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
-			var items = _reportingService.GetFullObjects(project.ProjectId, ObjectTypes.Dashboard);
+			var items = ReportingService.GetObjectMetaData(TestProjectId, ObjectTypes.Dashboard);
 			Assert.IsNotNull(items);
 			Assert.IsNotNullOrEmpty(items[0].Identifier);
 			Assert.IsNotNullOrEmpty(items[0].Title);
@@ -63,13 +62,12 @@ namespace GoodDataTests.Api
 		}
 
 		[Test]
-		public void GetDashboardReportsTest()
+		public void GetDepenciesTest()
 		{
-			var project = _reportingService.FindProjectByTitle(_reportingService.Config.Domain);
-			var items = _reportingService.Query(project.ProjectId, ObjectTypes.Dashboard);
+			var items = ReportingService.Query(TestProjectId, ObjectTypes.Dashboard);
 			foreach (var item in items)
 			{
-				var usingReponse = _reportingService.GetDependancies(project.ProjectId, item.ObjectId, true);
+				var usingReponse = ReportingService.GetDependancies(TestProjectId, item.ObjectId, true);
 				Assert.IsNotNull(usingReponse);
 				var reports =
 					usingReponse.Using.Nodes.Where(x => x.Category.Equals("report", StringComparison.OrdinalIgnoreCase)).ToList();

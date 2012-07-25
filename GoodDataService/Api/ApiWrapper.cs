@@ -9,28 +9,20 @@ namespace GoodDataService.Api
 {
 	public class ApiWrapper : ApiWrapperBase
 	{
-		private void CheckAuthentication()
-		{
-			if (CookieJar.Count == 0)
-			{
-				Authenticate(Config.Login, Config.Password);
-				GetToken();
-			}
-		}
-
 		#region Project
 
-		public string CreateProject(string title, string summary, string template = null)
+		public string CreateProject(string title, string summary, string template = null, string driver = SystemPlatforms.PostGres)
 		{
 			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.PROJECTS_URI);
-			var payload = new ProjectResponse
+			var payload = new ProjectResult()
 			              	{
 			              		Project = new Project
 			              		          	{
 			              		          		Content = new ProjectContent
 			              		          		          	{
-			              		          		          		GuidedNavigation = 1
+			              		          		          		GuidedNavigation = 1,
+																Driver = driver
 			              		          		          	},
 			              		          		Meta = new Meta
 			              		          		       	{
@@ -45,16 +37,16 @@ namespace GoodDataService.Api
 			return projectResponse.Uri.ExtractId(Constants.PROJECTS_URI);
 		}
 
-		public List<ProjectResponse> GetProjects()
+		public List<Project> GetProjects()
 		{
 			CheckAuthentication();
-			var list = new List<ProjectResponse>();
+			var list = new List<Project>();
 			var url = string.Concat(Config.Url, Constants.PROFILE_URI, "/", ProfileId, "/projects");
 			var response = GetRequest(url);
 			var projectResponse = JsonConvert.DeserializeObject(response, typeof (ProjectsResponse)) as ProjectsResponse;
 			if (projectResponse != null)
 			{
-				list.AddRange(projectResponse.Projects);
+				projectResponse.Projects.ForEach(p=>list.Add(p.Project));
 			}
 			return list;
 		}
@@ -69,9 +61,7 @@ namespace GoodDataService.Api
 		public Project FindProjectByTitle(string title)
 		{
 			var projects = GetProjects();
-			var projectWrapper =
-				projects.FirstOrDefault(u => string.Compare(u.Project.Meta.Title, title, StringComparison.OrdinalIgnoreCase) == 0);
-			return projectWrapper != null ? projectWrapper.Project : null;
+			return projects.FirstOrDefault(u => u.Meta.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
 		}
 
 		#endregion
@@ -223,7 +213,7 @@ namespace GoodDataService.Api
 
 		#region User
 
-		public string CreateUser(string login, string password, string verfiyPassword, string firstName, string lastName, string ssoProvider = "")
+		public string CreateUser(string login, string password, string verfiyPassword, string firstName, string lastName, string ssoProvider = "", string country = "US")
 		{
 			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.DOMAIN_URI, "/", Config.Domain, Constants.DOMAIN_USERS_SUFFIX);
@@ -236,7 +226,8 @@ namespace GoodDataService.Api
 			              		                 		VerifyPassword = verfiyPassword,
 			              		                 		FirstName = firstName,
 			              		                 		LastName = lastName,
-														SsoProvider = ssoProvider
+														SsoProvider = ssoProvider,
+														Country = country
 			              		                 	}
 			              	};
 			var response = PostRequest(url, payload);
@@ -244,10 +235,104 @@ namespace GoodDataService.Api
 			return userResponse.Uri.ExtractId(Constants.PROFILE_URI);
 		}
 
-		public void AddUsertoProject(string projectId, string userId, Roles role = Roles.DashboardOnly)
+		public string CreateUserFilter(string projectId, string filterTitle, string attributeTitle, string elementFilter, ExpressionTypes elementType = ExpressionTypes.Equal)
+		{
+			var attribute = FindAttributeByTitle(projectId, attributeTitle);
+			if (attribute == null) return null;
+
+			var element = FindAttributeElementByTitle(projectId, attribute, elementFilter);
+			if (element == null) return null;
+
+			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, "/obj");
+			var payload = new UserFilterRequest(filterTitle, attribute.Meta.Uri, element.Uri, elementType);
+			var response = PostRequest(url, payload);
+			var filterResponse = JsonConvert.DeserializeObject(response, typeof(UriResponse)) as UriResponse;
+			return filterResponse.Uri;
+		}
+
+		public AssignUserFiltersUpdateResult AssignUserFilters(string projectId, List<string> userprofileIds, List<string> userFilterUris)
+		{
+			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, "/userfilters");
+			var payload = new AssignUserFilterRequest(userprofileIds,userFilterUris);
+			var response = PostRequest(url, payload);
+			var assignResponse = JsonConvert.DeserializeObject(response, typeof(AssignUserFilterResponse)) as AssignUserFilterResponse;
+			return assignResponse.UserFiltersUpdateResult;
+		}
+
+		public dynamic FindObjectByTitle(string projectId, string title)
+		{
+			var item = Query(projectId, ObjectTypes.UserFilter).FindByTitle(title);
+			if (item == null) return null;
+
+			var url = string.Concat(Config.Url, item.Link);
+			var response = GetRequest(url);
+			var settings = new JsonSerializerSettings();
+			settings.Converters.Add(new BoolConverter());
+			var attributeResponse = JsonConvert.DeserializeObject(response, typeof(AttributeResponse), settings) as AttributeResponse;
+			return attributeResponse.Attribute;
+		}
+
+		public Models.Attribute FindAttributeByTitle(string projectId, string attributeTitle)
+		{
+			var attribute = Query(projectId, ObjectTypes.Attribute).FindByTitle(attributeTitle);
+			if (attribute == null) return null;
+	
+			var url = string.Concat(Config.Url, attribute.Link);
+			var response = GetRequest(url);
+			var settings = new JsonSerializerSettings();
+			settings.Converters.Add(new BoolConverter());
+			var attributeResponse = JsonConvert.DeserializeObject(response, typeof (AttributeResponse),settings) as AttributeResponse;
+			return attributeResponse.Attribute;
+		}
+
+		public List<Element> GetAttributeElements(string projectId, Models.Attribute attribute)
+		{
+			var url = string.Concat(Config.Url, attribute.Content.DisplayForms[0].Links.Elements);
+			var response = GetRequest(url);
+			var attributeElemntsResponse = JsonConvert.DeserializeObject(response, typeof(AttributeElemntsResponse)) as AttributeElemntsResponse;
+			return attributeElemntsResponse.AttributeElements.Elements;
+		}
+
+		public Element FindAttributeElementByTitle(string projectId, Models.Attribute attribute, string elementTitle)
+		{
+			var elements = GetAttributeElements(projectId, attribute);
+			return elements.FirstOrDefault(x => x.Title.Equals(elementTitle, StringComparison.OrdinalIgnoreCase));
+		}
+
+		public List<RoleResponse> GetRoles(string projectId)
+		{
+			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.PROJECT_ROLES_SUFFIX);
+			var response = GetRequest(url);
+			var rolesResponse = JsonConvert.DeserializeObject(response, typeof(RolesResponse)) as RolesResponse;
+			var list = new List<RoleResponse>();
+			foreach (var uri in rolesResponse.ProjectRoles.Roles)
+			{
+				var rawRoleResponse = GetRequest(string.Concat(Config.Url,uri));
+				var roleResponse = JsonConvert.DeserializeObject(rawRoleResponse, typeof (RoleResponse)) as RoleResponse;
+				roleResponse.ProjectRole.RoleId = uri.ExtractObjectId();
+				roleResponse.ProjectRole.Meta.Uri = uri; 
+				list.Add(roleResponse);
+			}
+			return list;
+		}
+
+		public RoleResponse FindRoleByTitle(string projectId, string systemRole)
+		{
+			return
+				GetRoles(projectId).FirstOrDefault(r => r.ProjectRole.Meta.Identifier.Equals(systemRole, StringComparison.OrdinalIgnoreCase));
+		}
+
+		public void AddUsertoProject(string projectId, string userId, string roleName = SystemRoles.DashboardOnly)
 		{
 			CheckAuthentication();
+
+			var projectRole = FindRoleByTitle(projectId, roleName);
+			if (projectRole == null)
+			{
+				throw new ArgumentException(string.Format("No role found for role name: {0}", roleName));
+			}
 			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.PROJECT_USERS_SUFFIX);
+
 			var payload = new ProjectUserRequest
 			              	{
 			              		User = new ProjectUserRequest.UserRequest
@@ -259,7 +344,7 @@ namespace GoodDataService.Api
 			              		       		          		            	{
 			              		       		          		            		string.Concat(Constants.PROJECTS_URI, "/", projectId,
 			              		       		          		            		              Constants.PROJECT_ROLES_SUFFIX,
-			              		       		          		            		              "/", (int) role)
+			              		       		          		            		              "/", projectRole.ProjectRole.RoleId)
 			              		       		          		            	}
 			              		       		          	},
 			              		       		Links = new ProjectUserRequest.UserRequest.LinksRequest
@@ -271,9 +356,10 @@ namespace GoodDataService.Api
 			PostRequest(url, payload);
 		}
 
-		public void UpdateProjectUserStatus(string projectId, string profileId, bool enabled)
+		public void UpdateProjectUserAccess(string projectId, string profileId, bool enabled, string roleName = SystemRoles.DashboardOnly)
 		{
 			CheckAuthentication();
+			var role = FindRoleByTitle(projectId, roleName);
 			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.PROJECT_USERS_SUFFIX);
 			var payload = new ProjectUserRequest
 			              	{
@@ -281,7 +367,8 @@ namespace GoodDataService.Api
 			              		       	{
 			              		       		Content = new ProjectUserRequest.UserRequest.ContentRequest
 			              		       		          	{
-			              		       		          		Status = (enabled) ? "ENABLED" : "DISABLED"
+			              		       		          		Status = (enabled) ? "ENABLED" : "DISABLED",
+															UserRoles = new List<string>{role.ProjectRole.Meta.Uri}
 			              		       		          	},
 			              		       		Links = new ProjectUserRequest.UserRequest.LinksRequest
 			              		       		        	{
@@ -290,7 +377,7 @@ namespace GoodDataService.Api
 			              		       	}
 			              	};
 			PostRequest(url, payload);
-		}
+		}		
 
 		public List<AccountResponseSettingWrapper> GetDomainUsers(string domain = "")
 		{
@@ -326,16 +413,14 @@ namespace GoodDataService.Api
 		public User FindProjectUsersByEmail(string projectId, string email)
 		{
 			var users = GetProjectUsers(projectId);
-			var userWrapper =
-				users.FirstOrDefault(u => string.Compare(u.User.Content.Email, email, StringComparison.OrdinalIgnoreCase) == 0);
+			var userWrapper = users.FirstOrDefault(u => u.User.Content.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
 			return userWrapper != null ? userWrapper.User : null;
 		}
 
 		public AccountResponseSetting FindDomainUsersByLogin(string email, string domain = "")
 		{
 			var users = GetDomainUsers(domain);
-			var userWrapper =
-				users.FirstOrDefault(u => string.Compare(u.AccountSetting.Login, email, StringComparison.OrdinalIgnoreCase) == 0);
+			var userWrapper = users.FirstOrDefault(u => u.AccountSetting.Login.Equals(email, StringComparison.OrdinalIgnoreCase));
 			return userWrapper != null ? userWrapper.AccountSetting : null;
 		}
 
@@ -399,9 +484,14 @@ namespace GoodDataService.Api
 				fragment = Constants.DASHBOARD_QUERY;
 			if (objectTypes == ObjectTypes.Metric)
 				fragment = Constants.METRICS_QUERY;
+			if (objectTypes == ObjectTypes.Attribute)
+				fragment = Constants.ATTRIBUTES_QUERY;
+			if (objectTypes == ObjectTypes.UserFilter)
+				fragment = Constants.USERFILTER_QUERY;
 			var response = GetRequest(string.Concat(Config.Url, Constants.MD_URI, projectId, fragment));
-
-			var queryResponse = JsonConvert.DeserializeObject(response, typeof (QueryResponse)) as QueryResponse;
+			var settings = new JsonSerializerSettings();
+			settings.Converters.Add(new BoolConverter());
+			var queryResponse = JsonConvert.DeserializeObject(response, typeof(QueryResponse), settings) as QueryResponse;
 			return queryResponse != null ? queryResponse.Query.Entries : null;
 		}
 
@@ -413,7 +503,7 @@ namespace GoodDataService.Api
 			return uris;
 		}
 
-		public List<ObjectMeta> GetFullObjects(string projectId, ObjectTypes objectTypes)
+		public List<ObjectMeta> GetObjectMetaData(string projectId, ObjectTypes objectTypes)
 		{
 			var entries = Query(projectId, objectTypes);
 			var list = new List<ObjectMeta>();
@@ -428,6 +518,9 @@ namespace GoodDataService.Api
 					case ObjectTypes.Report:
 						list.Add(ObjectMeta.MapReport(item));
 						break;
+					case ObjectTypes.UserFilter:
+						list.Add(ObjectMeta.MapUserFilter(item));
+						break;
 					default:
 						list.Add(ObjectMeta.MapMetric(item));
 						break;
@@ -438,7 +531,7 @@ namespace GoodDataService.Api
 
 		public List<ObjectMeta> GetActiveObjects(string projectId, ObjectTypes objectTypes)
 		{
-			var entries = GetFullObjects(projectId, objectTypes);
+			var entries = GetObjectMetaData(projectId, objectTypes);
 			return entries.Where(x => x.Deprecated == false).ToList();
 		}
 

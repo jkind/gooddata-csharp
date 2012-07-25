@@ -29,7 +29,7 @@ namespace GoodDataService.Api.Models
 			       		Tags = item.report.meta.tags,
 			       		Created = item.report.meta.created,
 			       		Identifier = item.report.meta.identifier,
-			       		Deprecated = item.report.meta.deprecated == "0" ? false : true,
+						Deprecated = item.report.meta.deprecated == "0" ? false : true,
 			       		Summary = item.report.meta.summary,
 			       		Updated = item.report.meta.updated,
 			       		Title = item.report.meta.title,
@@ -48,7 +48,7 @@ namespace GoodDataService.Api.Models
 			       		Tags = item.projectDashboard.meta.tags,
 			       		Created = item.projectDashboard.meta.created,
 			       		Identifier = item.projectDashboard.meta.identifier,
-			       		Deprecated = item.projectDashboard.meta.deprecated == "0" ? false : true,
+						Deprecated = item.projectDashboard.meta.deprecated == "0" ? false : true,
 			       		Summary = item.projectDashboard.meta.summary,
 			       		Updated = item.projectDashboard.meta.updated,
 			       		Title = item.projectDashboard.meta.title,
@@ -68,13 +68,33 @@ namespace GoodDataService.Api.Models
 			       		Tags = item.metric.meta.tags,
 			       		Created = item.metric.meta.created,
 			       		Identifier = item.metric.meta.identifier,
-			       		Deprecated = item.metric.meta.deprecated == "0" ? false : true,
+						Deprecated = item.metric.meta.deprecated == "0" ? false : true,
 			       		Summary = item.metric.meta.summary,
 			       		Updated = item.metric.meta.updated,
 			       		Title = item.metric.meta.title,
 			       		Category = item.metric.meta.category,
 			       		Contributor = item.metric.meta.contributor
 			       	};
+		}
+
+		public static ObjectMeta MapUserFilter(dynamic item)
+		{
+			return new ObjectMeta
+			{
+				ObjectType = ObjectTypes.UserFilter,
+				Content = item.userFilter,
+				Uri = item.userFilter.meta.uri,
+				Author = item.userFilter.meta.author,
+				Tags = item.userFilter.meta.tags,
+				Created = item.userFilter.meta.created,
+				Identifier = item.userFilter.meta.identifier,
+				Deprecated = item.userFilter.meta.deprecated == "0" ? false : true,
+				Summary = item.userFilter.meta.summary,
+				Updated = item.userFilter.meta.updated,
+				Title = item.userFilter.meta.title,
+				Category = item.userFilter.meta.category,
+				Contributor = item.userFilter.meta.contributor
+			};
 		}
 	}
 }

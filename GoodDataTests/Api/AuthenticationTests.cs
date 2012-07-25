@@ -1,31 +1,23 @@
-﻿using GoodDataService.Api;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace GoodDataTests.Api
 {
 	[TestFixture]
-	public class AuthenticationTests
+	public class AuthenticationTests : BaseTest
 	{
-		private readonly ApiWrapper reportingService;
-
-		public AuthenticationTests()
-		{
-			reportingService = new ApiWrapper();
-		}
-
 		[Test]
 		public void Authenticate_GoodCredentials_ExpectSucces()
 		{
-			reportingService.Authenticate(reportingService.Config.Login, reportingService.Config.Password);
-			Assert.IsNotNullOrEmpty(reportingService.ProfileId);
+			ReportingService.Authenticate(ReportingService.Config.Login, ReportingService.Config.Password);
+			Assert.IsNotNullOrEmpty(ReportingService.ProfileId);
 		}
 
 		[Test]
 		public void GetToken_ExpectSuccess()
 		{
-			reportingService.Authenticate(reportingService.Config.Login, reportingService.Config.Password);
-			reportingService.GetToken();
-			Assert.IsNotNullOrEmpty(reportingService.ProfileId);
+			ReportingService.Authenticate(ReportingService.Config.Login, ReportingService.Config.Password);
+			ReportingService.GetToken();
+			Assert.IsNotNullOrEmpty(ReportingService.ProfileId);
 		}
 	}
 }

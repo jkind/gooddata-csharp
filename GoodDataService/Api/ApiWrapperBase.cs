@@ -215,5 +215,12 @@ namespace GoodDataService.Api
 			webRequest.UserAgent = "GoodData CSharp CL/1.0";
 			webRequest.Headers.Add("Accept-Charset", "utf-8");
 		}
+
+		protected void CheckAuthentication()
+		{
+			if (CookieJar.Count != 0) return;
+			Authenticate(Config.Login, Config.Password);
+			GetToken();
+		}
 	}
 }

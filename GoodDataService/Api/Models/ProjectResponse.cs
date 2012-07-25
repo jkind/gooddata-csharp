@@ -6,10 +6,10 @@ namespace GoodDataService.Api.Models
 {
 	public class ProjectsResponse
 	{
-		public List<ProjectResponse> Projects { get; set; }
+		public List<ProjectResult> Projects { get; set; }
 	}
 
-	public class ProjectResponse
+	public class ProjectResult
 	{
 		public Project Project { get; set; }
 	}
@@ -32,6 +32,7 @@ namespace GoodDataService.Api.Models
 		public int GuidedNavigation { get; set; }
 		public string IsPublic { get; set; }
 		public string State { get; set; }
+		public string Driver { get; set; }
 	}
 
 	public class Meta

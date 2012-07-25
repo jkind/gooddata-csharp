@@ -17,6 +17,11 @@ namespace GoodDataService.Api.Models
 
 			public class ContentRequest
 			{
+				public ContentRequest()
+				{
+					Status = "ENABLED";
+				}
+
 				public string Status { get; set; }
 				public List<string> UserRoles { get; set; }
 			}

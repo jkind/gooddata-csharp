@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.0.1.8</version>
+    <version>1.0.2.0</version>
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
     <projectUrl>https://github.com/jkind/gooddata-csharp</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Fix references in nuget package</releaseNotes>
+    <releaseNotes>Fix how roles are created.</releaseNotes>
     <copyright>Copyright 2012</copyright>
     <references>
 		<reference file="Starksoft.Cryptography.OpenPGP.dll" />
