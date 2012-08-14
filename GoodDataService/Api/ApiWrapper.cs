@@ -589,21 +589,6 @@ namespace GoodDataService.Api
 			       	};
 		}
 
-		public ProfileSettingsRequest CreateUKFormat()
-		{
-			return new ProfileSettingsRequest
-			{
-				ProfileSetting = new ProfileSetting
-				{
-					Separators = new Separators
-					{
-						Decimal = ",",
-						Thousand = "."
-					}
-				}
-			};
-		}
-
 		public ProfileSetting ProfileSetting { get; set; }
 	}
 
