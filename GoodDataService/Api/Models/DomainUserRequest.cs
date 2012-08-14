@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace GoodDataService.Api.Models
 {
-	public class CreateDomainUser
+	public class DomainUserRequest
 	{
 		public AccountSetting AccountSetting { get; set; }
 	}
@@ -68,6 +68,7 @@ namespace GoodDataService.Api.Models
 		public AccountSettingLinks Links { get; set; }
 		public DateTime? Created { get; set; }
 		public DateTime? Updated { get; set; }
+		public string SsoProvider { get; set; }
 	}
 
 

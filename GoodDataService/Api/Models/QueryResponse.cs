@@ -18,14 +18,35 @@ namespace GoodDataService.Api.Models
 
 	public static class EntryFilters
 	{
-		public static Entry FindByTitle(this List<Entry> entries, string title)
+		public static List<Entry> FindByTitle(this List<Entry> entries, string title)
 		{
-			return entries.FirstOrDefault(x => x.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+			return entries.Where(x => x.Title.Equals(title, StringComparison.OrdinalIgnoreCase)).ToList();
 		}
 
-		public static Entry FindByLastUpdated(this List<Entry> entries, DateTime lastUpdated)
+		public static List<Entry> FindByGreaterThanLastUpdated(this List<Entry> entries, DateTime lastUpdated)
 		{
-			return entries.FirstOrDefault(x => x.Updated >= lastUpdated);
+			return entries.Where(x => x.Updated > lastUpdated).ToList();
+		}
+
+		public static List<Entry> FindByTag(this List<Entry> entries, List<string> tagFilter)
+		{
+			var filteredEntries = new List<Entry>();
+			foreach (var item in entries)
+			{
+				if (!string.IsNullOrEmpty(item.Tags))
+				{
+					var tags = item.Tags.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+					foreach (var tag in tags)
+					{
+						if (tagFilter.Any(t=>t.Equals(tag, StringComparison.OrdinalIgnoreCase)))
+						{
+							filteredEntries.Add(item);
+						}
+					}
+				}
+
+			}
+			return filteredEntries;
 		}
 	}
 

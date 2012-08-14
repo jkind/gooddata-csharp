@@ -37,7 +37,7 @@ namespace GoodDataTests.Api
 			ReportingService.UpdateProjectUserAccess(projectId, profileId, true,SystemRoles.Editor);
 			var user = ReportingService.FindProjectUsersByEmail(projectId,email);
 			var editorRole = ReportingService.FindRoleByTitle(projectId, SystemRoles.Editor);
-			if (user.Content.UserRoles.Any(role => role.Equals(editorRole.ProjectRole.Meta.Uri, StringComparison.OrdinalIgnoreCase)))
+			if (user.Content.UserRoles.Any(role => role.Equals(editorRole.Meta.Uri, StringComparison.OrdinalIgnoreCase)))
 				Assert.Pass();
 
 			ReportingService.DeleteUser(profileId);

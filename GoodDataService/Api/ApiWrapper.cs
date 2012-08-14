@@ -58,10 +58,23 @@ namespace GoodDataService.Api
 			DeleteRequest(url);
 		}
 
+		public void DeleteObjectByTitle(string projectId, string title, ObjectTypes objectType)
+		{
+			var item = FindObjectByTitle(projectId, title, objectType);
+			item.ForEach(i=>DeleteObject(projectId, i.Link));
+		}
+
+		public void DeleteObject(string projectId, string relativeUri)
+		{
+			CheckAuthentication();
+			var url = string.Concat(Config.Url, relativeUri);
+			DeleteRequest(url);
+		}
+
 		public Project FindProjectByTitle(string title)
 		{
 			var projects = GetProjects();
-			return projects.FirstOrDefault(u => u.Meta.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+			return projects.FirstOrDefault(u => u.Meta.Title.Equals((title ?? "").Trim(), StringComparison.OrdinalIgnoreCase));
 		}
 
 		#endregion
@@ -217,7 +230,7 @@ namespace GoodDataService.Api
 		{
 			CheckAuthentication();
 			var url = string.Concat(Config.Url, Constants.DOMAIN_URI, "/", Config.Domain, Constants.DOMAIN_USERS_SUFFIX);
-			var payload = new CreateDomainUser
+			var payload = new DomainUserRequest
 			              	{
 			              		AccountSetting = new AccountSetting
 			              		                 	{
@@ -235,16 +248,20 @@ namespace GoodDataService.Api
 			return userResponse.Uri.ExtractId(Constants.PROFILE_URI);
 		}
 
-		public string CreateUserFilter(string projectId, string filterTitle, string attributeTitle, string elementFilter, ExpressionTypes elementType = ExpressionTypes.Equal)
+		public string CreateUserFilter(string projectId, string filterTitle, string attributeTitle, List<string> elementFilter, bool inclusive=true)
 		{
 			var attribute = FindAttributeByTitle(projectId, attributeTitle);
 			if (attribute == null) return null;
 
-			var element = FindAttributeElementByTitle(projectId, attribute, elementFilter);
-			if (element == null) return null;
-
+			var elements = new List<Element>();
+			foreach (var item in elementFilter)
+			{
+				elements.Add(FindAttributeElementByTitle(projectId, attribute, item));	
+			}
+			if (elements.Count == 0) return null;
+			
 			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, "/obj");
-			var payload = new UserFilterRequest(filterTitle, attribute.Meta.Uri, element.Uri, elementType);
+			var payload = new UserFilterRequest(filterTitle, attribute.Meta.Uri, elements.Select(element => element.Uri).ToList(), inclusive);
 			var response = PostRequest(url, payload);
 			var filterResponse = JsonConvert.DeserializeObject(response, typeof(UriResponse)) as UriResponse;
 			return filterResponse.Uri;
@@ -259,25 +276,19 @@ namespace GoodDataService.Api
 			return assignResponse.UserFiltersUpdateResult;
 		}
 
-		public dynamic FindObjectByTitle(string projectId, string title)
+		public List<Entry> FindObjectByTitle(string projectId, string title, ObjectTypes objectType)
 		{
-			var item = Query(projectId, ObjectTypes.UserFilter).FindByTitle(title);
+			var item = Query(projectId, objectType).FindByTitle((title ?? "").Trim());
 			if (item == null) return null;
-
-			var url = string.Concat(Config.Url, item.Link);
-			var response = GetRequest(url);
-			var settings = new JsonSerializerSettings();
-			settings.Converters.Add(new BoolConverter());
-			var attributeResponse = JsonConvert.DeserializeObject(response, typeof(AttributeResponse), settings) as AttributeResponse;
-			return attributeResponse.Attribute;
+			return item;
 		}
 
 		public Models.Attribute FindAttributeByTitle(string projectId, string attributeTitle)
 		{
-			var attribute = Query(projectId, ObjectTypes.Attribute).FindByTitle(attributeTitle);
-			if (attribute == null) return null;
+			var attributes = Query(projectId, ObjectTypes.Attribute).FindByTitle((attributeTitle ?? "").Trim());
+			if (attributes == null) return null;
 	
-			var url = string.Concat(Config.Url, attribute.Link);
+			var url = string.Concat(Config.Url, attributes.First().Link);
 			var response = GetRequest(url);
 			var settings = new JsonSerializerSettings();
 			settings.Converters.Add(new BoolConverter());
@@ -299,27 +310,27 @@ namespace GoodDataService.Api
 			return elements.FirstOrDefault(x => x.Title.Equals(elementTitle, StringComparison.OrdinalIgnoreCase));
 		}
 
-		public List<RoleResponse> GetRoles(string projectId)
+		public List<ProjectRole> GetRoles(string projectId)
 		{
 			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.PROJECT_ROLES_SUFFIX);
 			var response = GetRequest(url);
 			var rolesResponse = JsonConvert.DeserializeObject(response, typeof(RolesResponse)) as RolesResponse;
-			var list = new List<RoleResponse>();
+			var list = new List<ProjectRole>();
 			foreach (var uri in rolesResponse.ProjectRoles.Roles)
 			{
 				var rawRoleResponse = GetRequest(string.Concat(Config.Url,uri));
 				var roleResponse = JsonConvert.DeserializeObject(rawRoleResponse, typeof (RoleResponse)) as RoleResponse;
 				roleResponse.ProjectRole.RoleId = uri.ExtractObjectId();
 				roleResponse.ProjectRole.Meta.Uri = uri; 
-				list.Add(roleResponse);
+				list.Add(roleResponse.ProjectRole);
 			}
 			return list;
 		}
 
-		public RoleResponse FindRoleByTitle(string projectId, string systemRole)
+		public ProjectRole FindRoleByTitle(string projectId, string systemRole = SystemRoles.DashboardOnly)
 		{
 			return
-				GetRoles(projectId).FirstOrDefault(r => r.ProjectRole.Meta.Identifier.Equals(systemRole, StringComparison.OrdinalIgnoreCase));
+				GetRoles(projectId).FirstOrDefault(r => r.Meta.Identifier.Equals(systemRole, StringComparison.OrdinalIgnoreCase));
 		}
 
 		public void AddUsertoProject(string projectId, string userId, string roleName = SystemRoles.DashboardOnly)
@@ -344,7 +355,7 @@ namespace GoodDataService.Api
 			              		       		          		            	{
 			              		       		          		            		string.Concat(Constants.PROJECTS_URI, "/", projectId,
 			              		       		          		            		              Constants.PROJECT_ROLES_SUFFIX,
-			              		       		          		            		              "/", projectRole.ProjectRole.RoleId)
+			              		       		          		            		              "/", projectRole.RoleId)
 			              		       		          		            	}
 			              		       		          	},
 			              		       		Links = new ProjectUserRequest.UserRequest.LinksRequest
@@ -368,7 +379,7 @@ namespace GoodDataService.Api
 			              		       		Content = new ProjectUserRequest.UserRequest.ContentRequest
 			              		       		          	{
 			              		       		          		Status = (enabled) ? "ENABLED" : "DISABLED",
-															UserRoles = new List<string>{role.ProjectRole.Meta.Uri}
+															UserRoles = new List<string>{role.Meta.Uri}
 			              		       		          	},
 			              		       		Links = new ProjectUserRequest.UserRequest.LinksRequest
 			              		       		        	{
@@ -377,7 +388,30 @@ namespace GoodDataService.Api
 			              		       	}
 			              	};
 			PostRequest(url, payload);
-		}		
+		}
+
+		public void UpdateProfileSettings(string projectId, string profileId)
+		{
+			CheckAuthentication();
+			var url = string.Concat(Config.Url, Constants.PROFILE_URI, profileId, Constants.PROFILE_SETTINGS_SUFFIX);
+			var payload = ProfileSettingsRequest.CreateUSFormat();
+			PostRequest(url, payload);
+		}
+
+		public void UpdateSSOProvider(string profileId)
+		{
+			CheckAuthentication();
+			var url = string.Concat(Config.Url, Constants.PROFILE_URI, "/",profileId);
+			var payload = new DomainUserRequest()
+			              	{
+			              		AccountSetting = new AccountSetting()
+			              		                 	{
+			              		                 		SsoProvider = Config.Domain + ".com"
+			              		                 	}
+			              	};
+			PutRequest(url, payload);
+		}
+
 
 		public List<AccountResponseSettingWrapper> GetDomainUsers(string domain = "")
 		{
@@ -537,4 +571,51 @@ namespace GoodDataService.Api
 
 		#endregion
 	}
+
+	public class ProfileSettingsRequest
+	{
+		public static ProfileSettingsRequest CreateUSFormat()
+		{
+			return new ProfileSettingsRequest
+			       	{
+			       		ProfileSetting = new ProfileSetting
+			       		                 	{
+			       		                 		Separators = new Separators
+			       		                 		             	{
+			       		                 		             		Decimal = ".",
+			       		                 		             		Thousand = ","
+			       		                 		             	}
+			       		                 	}
+			       	};
+		}
+
+		public ProfileSettingsRequest CreateUKFormat()
+		{
+			return new ProfileSettingsRequest
+			{
+				ProfileSetting = new ProfileSetting
+				{
+					Separators = new Separators
+					{
+						Decimal = ",",
+						Thousand = "."
+					}
+				}
+			};
+		}
+
+		public ProfileSetting ProfileSetting { get; set; }
+	}
+
+	public class ProfileSetting
+	{
+		public Separators Separators { get; set; }
+
+	}
+	public class Separators
+	{
+		public string Thousand { get; set; }
+		public string Decimal { get; set; }
+    }
+		
 }

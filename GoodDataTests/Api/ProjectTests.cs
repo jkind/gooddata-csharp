@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GoodDataService;
 using NUnit.Framework;
 
@@ -64,6 +65,26 @@ namespace GoodDataTests.Api
 			projects = ReportingService.FindProjectByTitle(title);
 
 			Assert.IsNull(projects);
+		}
+
+		[Test]
+		[Ignore]
+		public void DeleteMySqlProjects()
+		{
+			var projects = ReportingService.GetProjects().Where(x=>x.Content.Driver==SystemPlatforms.MySql).Where(x=>!x.Meta.Title.Contains("release")).ToList();
+			projects.ForEach(x => Console.WriteLine(x.Meta.Title));
+			//foreach (var project in projects)
+			//{
+			//    try
+			//    {
+			//        ReportingService.DeleteProject(project.ProjectId);
+			//    }
+			//    catch (Exception)
+			//    {
+					
+			//    }
+			//}
+			Assert.NotNull(projects);
 		}
 	}
 }

@@ -78,6 +78,11 @@ namespace GoodDataService.Api
 			return MakeRequest(url, "GET", null);
 		}
 
+		public string PutRequest(string url, object postData)
+		{
+			return MakeRequest(url, "PUT", postData);
+		}
+
 		public void DeleteRequest(string url)
 		{
 			MakeRequest(url, "DELETE", null);
@@ -130,7 +135,7 @@ namespace GoodDataService.Api
 			if (webRequest != null)
 			{
 				SetupRequest(webRequest, method);
-				if (webRequest.Method == WebRequestMethods.Http.Post)
+				if (webRequest.Method == WebRequestMethods.Http.Post || webRequest.Method == WebRequestMethods.Http.Put)
 				{
 					SetupPostData(webRequest, postData);
 				}
@@ -154,6 +159,13 @@ namespace GoodDataService.Api
 				{
 					var httpResponse = (HttpWebResponse) exceptionResponse;
 					Trace.WriteLine(string.Format("Error code: {0}", httpResponse.StatusCode));
+					//Retry the request by reauth and get token;
+					if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+					{
+						CheckAuthentication();
+						MakeRequest(url, method, postData);
+					}
+
 					using (var data = exceptionResponse.GetResponseStream())
 					{
 						var text = new StreamReader(data).ReadToEnd();

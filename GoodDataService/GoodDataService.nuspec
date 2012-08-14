@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.0.2.0</version>
+    <version>1.0.2.1</version>
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
     <projectUrl>https://github.com/jkind/gooddata-csharp</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Fix how roles are created.</releaseNotes>
+    <releaseNotes>Clean up Get Roles and add FindObjectByTitle method</releaseNotes>
     <copyright>Copyright 2012</copyright>
     <references>
 		<reference file="Starksoft.Cryptography.OpenPGP.dll" />

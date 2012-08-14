@@ -1,4 +1,6 @@
-﻿namespace GoodDataService.Api.Models
+﻿using System.Collections.Generic;
+
+namespace GoodDataService.Api.Models
 {
 //    {
 //    "userFilter": {
@@ -15,26 +17,38 @@
 	public class UserFilterRequest
 	{
 		public UserFilter UserFilter { get; set; }
-		public UserFilterRequest(string title, string name, string value, ExpressionTypes expressionType)
+		public UserFilterRequest(string title, string name, List<string> value, bool inclusive = true)
 		{
-			var pattern = "[{0}]=[{1}]";
-			switch (expressionType)
+			var expressionType = ExpressionTypes.Equal;
+			if (value.Count > 1)
+				expressionType = ExpressionTypes.In;
+
+			if (!inclusive)
 			{
-				case ExpressionTypes.NotEqual:
-					pattern = "[{0}]<>[{1}]";
-					break;
-				case ExpressionTypes.In:
-					pattern = "[{0}] IN [{1}]";
-					break;
-				case ExpressionTypes.NotIn:
-					pattern = "[{0}] NOT IN [{1}]";
-					break;
+				expressionType = ExpressionTypes.NotEqual;
+				if (value.Count > 1)
+					expressionType = ExpressionTypes.NotIn;
 			}
-			UserFilter = new UserFilter()
+
+			//default, equals pattern
+			var pattern = "[{0}]=[{1}]";
+			var expression = string.Format(pattern, name, string.Join(",", value));
+			if (expressionType == ExpressionTypes.NotEqual)
+			{
+				pattern = "[{0}]<>[{1}]";
+				expression = string.Format(pattern, name, string.Join(",", value));
+			}
+			if (expressionType == ExpressionTypes.In || expressionType == ExpressionTypes.NotIn)
+			{
+				pattern = (expressionType == ExpressionTypes.In) ? "[{0}] IN ([{1}])" : "[{0}] NOT IN ([{1}])";
+				expression = string.Format(pattern, name, string.Join("],[", value));
+			}
+		
+			UserFilter = new UserFilter
 			             	{
 			             		Content = new UserFilterContent()
 			             		          	{
-			             		          		Expression = string.Format(pattern, name, value)
+			             		          		Expression = expression
 			             		          	},
 			             		Meta = new UserFilterMeta()
 			             		       	{

@@ -104,31 +104,65 @@ namespace GoodDataTests.Api
 
 		[Test]
 		[Ignore]
-		public void CreateUserFilter_ExpectSucces()
+		public void CreateUserFilter_Equals_ExpectSucces()
+		{
+			BaseUserFilterTest(new List<string>() {"43"},true);
+		}
+
+		[Test]
+		[Ignore]
+		public void CreateUserFilter_NotEquals_ExpectSucces()
+		{
+			BaseUserFilterTest(new List<string>() { "43" },false);
+		}
+
+		[Test]
+		[Ignore]
+		public void CreateUserFilter_In_ExpectSucces()
+		{
+			BaseUserFilterTest(new List<string>() {"43", "75"},true);
+		}
+
+		[Test]
+		[Ignore]
+		public void CreateUserFilter_NotIn_ExpectSucces()
+		{
+			BaseUserFilterTest(new List<string>() { "43", "75" }, false);
+		}
+
+		private void BaseUserFilterTest(List<string> expresionfilter, bool inclusive, bool deleteUser=true)
 		{
 			var title = DateTime.Now.Ticks.ToString();
-			var login = string.Format("tester+{0}@{1}.com", title, ReportingService.Config.Domain);
+			var login = string.Format("jkind+{0}@{1}.com", title, ReportingService.Config.Domain);
 			var password = "password";
 			var firstName = "firstname" + title;
 			var lastName = "lastName" + title;
 			var ssoProvider = ReportingService.Config.Domain + ".com";
-			var newProfileId = ReportingService.CreateUser(login, password, password, firstName, lastName, ssoProvider.ToLower(), "CA");
+			var newProfileId = ReportingService.CreateUser(login, password, password, firstName, lastName, ssoProvider.ToLower(), "US");
 			Assert.IsNotNullOrEmpty(newProfileId);
 
 			var projectId = GetTestProject().ProjectId;
-			ReportingService.AddUsertoProject(projectId, newProfileId);
+			ReportingService.AddUsertoProject(projectId, newProfileId, SystemRoles.Viewer);
 
-			var response = ReportingService.CreateUserFilter(projectId, "Segment", "Segment Id", "1");
+			var filterTitle = login + " - Segment Id";
+			var response = ReportingService.CreateUserFilter(projectId,filterTitle, "Segment Id", expresionfilter,inclusive);
 			Assert.IsNotNullOrEmpty(response);
 			var filter = ReportingService.GetObject(response);
 			Assert.IsNotNull(filter);
 
-			var assignResponse = ReportingService.AssignUserFilters(projectId, new List<string> {newProfileId},new List<string> {response});
+			var assignResponse = ReportingService.AssignUserFilters(projectId, new List<string> { newProfileId }, new List<string> { response });
 			Assert.IsTrue(assignResponse.Successful.Any(item => item.Contains(newProfileId)));
 
-			ReportingService.DeleteUser(newProfileId);
-			var domainUser = ReportingService.FindDomainUsersByLogin(login);
-			Assert.IsNull(domainUser);
+			ReportingService.DeleteObjectByTitle(projectId, filterTitle,ObjectTypes.UserFilter);
+			var items = ReportingService.FindObjectByTitle(projectId, filterTitle, ObjectTypes.UserFilter);
+			Assert.True(items.Count==0);
+
+			if (deleteUser)
+			{
+				ReportingService.DeleteUser(newProfileId);
+				var domainUser = ReportingService.FindDomainUsersByLogin(login);
+				Assert.IsNull(domainUser);
+			}
 		}
 
 		[Test]
@@ -213,6 +247,28 @@ namespace GoodDataTests.Api
 			Assert.IsTrue(user.Content.Status == "DISABLED");
 			Assert.IsTrue(user.Content.Email == email);
 			ReportingService.UpdateProjectUserAccess(project.ProjectId, user.ProfileId, true);
+		}
+
+		[Test]
+		[Ignore]
+		public void UpdateDomainUserExpectSucces()
+		{
+
+			var users = ReportingService.GetDomainUsers();
+			foreach (var user in users)
+			{
+				try
+				{
+					ReportingService.UpdateSSOProvider(user.AccountSetting.Login);
+				}
+				catch (Exception)
+				{
+
+					throw;
+				}
+
+			}
+			
 		}
 	}
 }

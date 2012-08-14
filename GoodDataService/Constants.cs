@@ -19,6 +19,7 @@
 		public static readonly string MD_URI = "/gdc/md/";
 		public static readonly string OBJ_URI = "/obj";
 		public static readonly string PROFILE_URI = "/gdc/account/profile";
+		public static readonly string PROFILE_SETTINGS_SUFFIX = "/settings";
 		public static readonly string PROJECTS_URI = "/gdc/projects";
 		public static readonly string PROJECT_EXPORT_URI = "/maintenance/export";
 		public static readonly string PROJECT_IMPORT_URI = "/maintenance/import";

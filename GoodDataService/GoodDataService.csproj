@@ -64,7 +64,7 @@
     <Compile Include="Api\Models\ExportRequest.cs" />
     <Compile Include="Api\Models\ProjectUserRequest.cs" />
     <Compile Include="Configuration\GoodDataConfigurationSection.cs" />
-    <Compile Include="Api\Models\CreateDomainUser.cs" />
+    <Compile Include="Api\Models\DomainUserRequest.cs" />
     <Compile Include="Api\Models\ErrorResponse.cs" />
     <Compile Include="Api\Models\GoodDataApiException.cs" />
     <Compile Include="Api\Models\ProjectResponse.cs" />
