@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.0.2.1</version>
+    <version>1.0.2.2</version>
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
     <projectUrl>https://github.com/jkind/gooddata-csharp</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Clean up Get Roles and add FindObjectByTitle method</releaseNotes>
+    <releaseNotes>Fix export/import partials. Add more logging on user filter creation. Add ability to get roles and filters with a user</releaseNotes>
     <copyright>Copyright 2012</copyright>
     <references>
 		<reference file="Starksoft.Cryptography.OpenPGP.dll" />
