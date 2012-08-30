@@ -10,12 +10,16 @@ namespace GoodDataService.SSO
 	/// <see cref = "http://sourceforge.net/projects/starksoftopenpg/" />
 	public class GnuPgpProcessor
 	{
-		private readonly GnuPG gpg;
-
+		private readonly GnuPG _gpg;
+		
 		public GnuPgpProcessor()
 		{
-			gpg = new GnuPG();
-			gpg.HomePath = @"C:\gnupg";
+			var path = new GpgPath();
+			_gpg = new GnuPG
+				      {
+					      HomePath = path.GetHomeFolderPath(), 
+						  BinaryPath = path.GetExeFullPath()
+				      };
 		}
 
 		/// <summary>
@@ -35,9 +39,9 @@ namespace GoodDataService.SSO
 			using (var encrypted = new MemoryStream())
 			{
 				// create a new GnuPG object
-				gpg.OutputType = OutputTypes.AsciiArmor;
-				gpg.Recipient = recipient;
-				gpg.Encrypt(unencrypted, encrypted);
+				_gpg.OutputType = OutputTypes.AsciiArmor;
+				_gpg.Recipient = recipient;
+				_gpg.Encrypt(unencrypted, encrypted);
 				using (var reader = new StreamReader(encrypted))
 				{
 					encrypted.Position = 0;
@@ -54,9 +58,9 @@ namespace GoodDataService.SSO
 			using (var unencrypted = new MemoryStream())
 			using (var encrypted = new MemoryStream(Encoding.ASCII.GetBytes(encryptedText)))
 			{
-				gpg.Passphrase = passphrase;
-				gpg.OutputType = OutputTypes.AsciiArmor;
-				gpg.Decrypt(encrypted, unencrypted);
+				_gpg.Passphrase = passphrase;
+				_gpg.OutputType = OutputTypes.AsciiArmor;
+				_gpg.Decrypt(encrypted, unencrypted);
 
 				using (var reader = new StreamReader(unencrypted))
 				{
@@ -75,9 +79,9 @@ namespace GoodDataService.SSO
 			using (var signed = new MemoryStream())
 			{
 				// create a new GnuPG object
-				gpg.OutputType = OutputTypes.AsciiArmor;
-				gpg.Passphrase = passphrase;
-				gpg.Sign(unsigned, signed);
+				_gpg.OutputType = OutputTypes.AsciiArmor;
+				_gpg.Passphrase = passphrase;
+				_gpg.Sign(unsigned, signed);
 
 				using (var reader = new StreamReader(signed))
 				{
@@ -94,7 +98,7 @@ namespace GoodDataService.SSO
 
 			using (var signed = new MemoryStream(Convert.FromBase64String(encryptedText)))
 			{
-				gpg.Verify(signed);
+				_gpg.Verify(signed);
 			}
 		}
 	}

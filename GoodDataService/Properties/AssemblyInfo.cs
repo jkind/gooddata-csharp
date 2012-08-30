@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("GoodDataService")]
@@ -13,3 +14,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("4fddb919-f2ef-48c3-afc4-e7077b261ada")]
 [assembly: AssemblyVersion("1.0.2.2")]
 [assembly: AssemblyFileVersion("1.0.2.2")]
+[assembly: InternalsVisibleTo("GoodDataTests")]
