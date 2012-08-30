@@ -45,7 +45,7 @@ namespace GoodDataService.Api
 			              		                		Password = password
 			              		                	}
 			              	};
-			var response = PostRequest(url, payload);
+			var response = InternalPostRequest(url, payload, false);
 			var userResponse = JsonConvert.DeserializeObject(response, typeof (AuthenticationResponse)) as AuthenticationResponse;
 			if (userResponse != null)
 			{
@@ -70,7 +70,12 @@ namespace GoodDataService.Api
 
 		public string PostRequest(string url, object postData)
 		{
-			return MakeRequest(url, "POST", postData);
+			return InternalPostRequest(url, postData, true);
+		}
+
+		private string InternalPostRequest(string url, object postData, bool retry)
+		{
+			return MakeRequest(url, "POST", postData, retry);
 		}
 
 		public string GetRequest(string url)
@@ -126,7 +131,7 @@ namespace GoodDataService.Api
 			}
 		}
 
-		private string MakeRequest(string url, string method, object postData)
+		private string MakeRequest(string url, string method, object postData, bool retry = true)
 		{
 			var webRequest = WebRequest.Create(url) as HttpWebRequest;
 			// allows for skipping validation warnings such as from self-signed certs
@@ -160,7 +165,7 @@ namespace GoodDataService.Api
 					var httpResponse = (HttpWebResponse) exceptionResponse;
 					Trace.WriteLine(string.Format("Error code: {0}", httpResponse.StatusCode));
 					//Retry the request by reauth and get token;
-					if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+					if (retry && httpResponse.StatusCode == HttpStatusCode.Unauthorized)
 					{
 						CheckAuthentication();
 						MakeRequest(url, method, postData);
