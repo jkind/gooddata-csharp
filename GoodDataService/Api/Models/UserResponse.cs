@@ -22,6 +22,12 @@ namespace GoodDataService.Api.Models
 			get { return Links.Self.ExtractId(Constants.PROFILE_URI); }
 		}
 
+		[JsonIgnore]
+		public List<string> RoleNames  { get; set; }
+
+		[JsonIgnore]
+		public List<string> UserFilterNames { get; set; }
+
 		public UserContent Content { get; set; }
 		public UserLinks Links { get; set; }
 		public UserMeta Meta { get; set; }

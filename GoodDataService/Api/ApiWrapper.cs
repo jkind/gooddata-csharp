@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using GoodDataService.Api.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GoodDataService.Api
 {
@@ -149,7 +150,7 @@ namespace GoodDataService.Api
 			              	};
 			var response = PostRequest(url, payload);
 			var exportResponse = JsonConvert.DeserializeObject(response, typeof (PartialExportResponse)) as PartialExportResponse;
-			return exportResponse.PartialMdArtifact;
+			return exportResponse.PartialMDArtifact;
 		}
 
 		public string ImportProject(string projectId, string token)
@@ -169,7 +170,7 @@ namespace GoodDataService.Api
 			return importResponse.Uri;
 		}
 
-		public string ImportPartials(string projectId, string token, bool overwriteNewer = false,
+		public string ImportPartials(string projectId, string token, bool overwriteNewer = true,
 		                             bool updateLdmObjects = false)
 		{
 			CheckAuthentication();
@@ -177,11 +178,11 @@ namespace GoodDataService.Api
 
 			var payload = new PartialImportRequest
 			              	{
-			              		PartialMdImport = new PartialMdImport
+			              		PartialMDImport = new PartialMDImport
 			              		                  	{
 			              		                  		Token = token,
-			              		                  		OverwriteNewer = overwriteNewer,
-			              		                  		UpdateLdmObjects = updateLdmObjects
+			              		                  		OverwriteNewer = (overwriteNewer) ? 1 : 0,
+			              		                  		UpdateLDMObjects = (updateLdmObjects)? 1 : 0
 			              		                  	}
 			              	};
 			var response = PostRequest(url, payload);
@@ -196,6 +197,15 @@ namespace GoodDataService.Api
 			var response = GetRequest(url);
 			var taskResponse = JsonConvert.DeserializeObject(response, typeof (TaskResponse)) as TaskResponse;
 			return (taskResponse.TaskState.Status == Enum.GetName(typeof (TaskStates), TaskStates.OK));
+		}
+
+		public bool PollPartialStatus(string uri)
+		{
+			CheckAuthentication();
+			var url = string.Concat(Config.Url, uri);
+			var response = GetRequest(url);
+			var taskResponse = JsonConvert.DeserializeObject(response, typeof(PartialTaskResponse)) as PartialTaskResponse;
+			return (taskResponse.wTaskStatus.Status == "OK");
 		}
 
 		public WebResponse GetFile(string uri)
@@ -248,17 +258,36 @@ namespace GoodDataService.Api
 			return userResponse.Uri.ExtractId(Constants.PROFILE_URI);
 		}
 
+		public void DeleteUserFilter(string projectId, string filterTitle)
+		{
+			DeleteObjectByTitle(projectId, filterTitle, ObjectTypes.UserFilter);
+		}
+
 		public string CreateUserFilter(string projectId, string filterTitle, string attributeTitle, List<string> elementFilter, bool inclusive=true)
 		{
+			
 			var attribute = FindAttributeByTitle(projectId, attributeTitle);
-			if (attribute == null) return null;
+			if (attribute == null)
+			{
+				Console.WriteLine(string.Format("No attribute found with title {0}",attributeTitle));
+				return null;
+			}
 
 			var elements = new List<Element>();
 			foreach (var item in elementFilter)
 			{
-				elements.Add(FindAttributeElementByTitle(projectId, attribute, item));	
+				var fullAttribute = FindAttributeElementByTitle(projectId, attribute, item);
+				if (fullAttribute != null)
+				{
+					elements.Add(fullAttribute);
+				}
+				
 			}
-			if (elements.Count == 0) return null;
+			if (elements.Count == 0)
+			{
+				Console.WriteLine(string.Format("No element {0} found for attribute {1}",string.Join(",",elementFilter),attribute.Meta.Identifier));
+				return null;
+			}
 			
 			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, "/obj");
 			var payload = new UserFilterRequest(filterTitle, attribute.Meta.Uri, elements.Select(element => element.Uri).ToList(), inclusive);
@@ -420,14 +449,32 @@ namespace GoodDataService.Api
 				domain = Config.Domain;
 			var list = new List<AccountResponseSettingWrapper>();
 			var url = string.Concat(Config.Url, Constants.DOMAIN_URI, "/", domain, Constants.DOMAIN_USERS_SUFFIX);
-			var response = GetRequest(url);
-			var usersResponse =
-				JsonConvert.DeserializeObject(response, typeof (CreateDomainUserResponse)) as CreateDomainUserResponse;
-			if (usersResponse != null)
-			{
-				list.AddRange(usersResponse.AccountSettings.Items);
-			}
+			GetDomainUsers(url, ref list);
 			return list;
+		}
+
+		private void GetDomainUsers(string url, ref List<AccountResponseSettingWrapper> list)
+		{
+			var response = GetRequest(url);
+			try
+			{
+				var usersResponse = JsonConvert.DeserializeObject(response, typeof(CreateDomainUserResponse)) as CreateDomainUserResponse;
+				if (usersResponse != null)
+				{
+					list.AddRange(usersResponse.AccountSettings.Items);
+				}
+
+				var o = JObject.Parse(response);
+				var nextSetUrl = (string)o["accountSettings"]["paging"]["next"];
+				if (nextSetUrl != null)
+				{
+					GetDomainUsers(string.Concat(Config.Url, nextSetUrl),ref list);
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+			}
 		}
 
 		public List<UserWrapper> GetProjectUsers(string projectId)
@@ -451,7 +498,90 @@ namespace GoodDataService.Api
 			return userWrapper != null ? userWrapper.User : null;
 		}
 
-		public AccountResponseSetting FindDomainUsersByLogin(string email, string domain = "")
+		public List<User> GetFullProjectUsers(string projectId)
+		{
+			var list = new List<User>();
+			var users = GetProjectUsers(projectId);
+			foreach (var userWrapper in users)
+			{
+				//Fetch roles
+				var roleNames = new List<string>();
+				foreach (var role in userWrapper.User.Content.UserRoles)
+				{
+					var url = string.Concat(Config.Url, role);
+					var response = GetRequest(url);
+					dynamic roleResponse = JsonConvert.DeserializeObject<object>(response);
+					var roleName = (string) roleResponse.projectRole.meta.title;
+					roleNames.Add(roleName);
+				}
+				userWrapper.User.RoleNames = roleNames;
+
+				//Fetch UserFilters
+				var userfilterNames = new List<string>();
+				var userfilters = Query(projectId, ObjectTypes.UserFilter);
+				userfilters = userfilters.Where(x => x.Title.Contains(userWrapper.User.Content.Email)).ToList();
+				foreach (var userfilter in userfilters)
+				{
+					if (userfilter.Title.Contains(userWrapper.User.Content.Email))
+					{
+						var url = string.Concat(Config.Url, userfilter.Link);
+						var response = GetRequest(url);
+						var userFilterResponse =
+							JsonConvert.DeserializeObject(response, typeof (UserFilterResponse)) as UserFilterResponse;
+						var elements = userFilterResponse.UserFilter.Content.Objects.Where(x => x.Category == "attributeElement");
+						var titles = elements.Select(userFilterObject => userFilterObject.Title).ToList();
+						userfilterNames.Add(userfilter.Title.Replace(userWrapper.User.Content.Email + " - ", "") + ": " + string.Join(", ", titles));
+						Console.WriteLine("yes");
+					}
+				}
+				userWrapper.User.UserFilterNames = userfilterNames;
+				list.Add(userWrapper.User);
+			}
+			return list;
+		}
+
+		public User GetFullProjectUsersByEmail(string projectId, string email)
+		{
+			var users = GetProjectUsers(projectId);
+			var userWrapper = users.FirstOrDefault(u => u.User.Content.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+			
+			//Fetch roles
+			var roleNames = new List<string>();
+			foreach (var role in userWrapper.User.Content.UserRoles)
+			{
+				var url = string.Concat(Config.Url, role);
+				var response = GetRequest(url);
+				dynamic roleResponse = JsonConvert.DeserializeObject<object>(response);
+				var roleName = (string) roleResponse.projectRole.meta.title;
+				roleNames.Add(roleName);
+			}
+			userWrapper.User.RoleNames = roleNames;
+
+			//Fetch UserFilters
+			var userfilterNames = new List<string>();
+			var userfilters = Query(projectId, ObjectTypes.UserFilter);
+			userfilters = userfilters.Where(x => x.Title.Contains(email)).ToList();
+			foreach (var userfilter in userfilters)
+			{
+				if (userfilter.Title.Contains(email))
+				{
+					var url = string.Concat(Config.Url, userfilter.Link);
+					var response = GetRequest(url);
+					var userFilterResponse = JsonConvert.DeserializeObject(response, typeof (UserFilterResponse)) as UserFilterResponse;
+					var elements = userFilterResponse.UserFilter.Content.Objects.Where(x=>x.Category=="attributeElement");
+					var titles = elements.Select(userFilterObject => userFilterObject.Title).ToList();
+					userfilterNames.Add(userfilter.Title.Replace(email + " - ", "") + ": " +string.Join(", ", titles));
+					Console.WriteLine("yes");
+				}
+			}
+			userWrapper.User.UserFilterNames = userfilterNames;
+
+			
+
+			return userWrapper.User;
+		}
+
+		public AccountResponseSetting FindDomainUsersByLogin(string email, string domain="")
 		{
 			var users = GetDomainUsers(domain);
 			var userWrapper = users.FirstOrDefault(u => u.AccountSetting.Login.Equals(email, StringComparison.OrdinalIgnoreCase));

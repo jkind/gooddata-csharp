@@ -74,6 +74,20 @@ namespace GoodDataService.Api.Models
 	public class UserFilterContent
 	{
 		public string Expression { get; set; }
+		public List<UserFilterObject> Objects { get; set; }
 		
+	}
+
+	public class UserFilterObject
+	{
+		public string Category { get; set; }
+		public string Title { get; set; }
+		public string AttributeUri { get; set; }
+		public string Uri { get; set; }
+	}
+
+	public class UserFilterResponse
+	{
+		public UserFilter UserFilter { get; set; }	
 	}
 }

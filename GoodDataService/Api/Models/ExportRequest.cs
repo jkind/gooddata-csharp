@@ -47,19 +47,19 @@ namespace GoodDataService.Api.Models
 
 	public class PartialExportResponse
 	{
-		public ExportArtifact PartialMdArtifact { get; set; }
+		public ExportArtifact PartialMDArtifact { get; set; }
 	}
 
 	public class PartialImportRequest
 	{
-		public PartialMdImport PartialMdImport { get; set; }
+		public PartialMDImport PartialMDImport { get; set; }
 	}
 
-	public class PartialMdImport
+	public class PartialMDImport
 	{
 		public string Token { get; set; }
-		public bool OverwriteNewer { get; set; }
-		public bool UpdateLdmObjects { get; set; }
+		public int OverwriteNewer { get; set; }
+		public int UpdateLDMObjects { get; set; }
 	}
 
 	public class IdentifiersResponse
@@ -114,6 +114,16 @@ namespace GoodDataService.Api.Models
 	public class TaskState
 	{
 		public string Msg { get; set; }
+		public string Status { get; set; }
+	}
+
+	public class PartialTaskResponse
+	{
+		public wTaskStatus wTaskStatus { get; set; }
+	}
+
+	public class wTaskStatus
+	{
 		public string Status { get; set; }
 	}
 }

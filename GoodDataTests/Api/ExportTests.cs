@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using GoodDataService;
 using NUnit.Framework;
 
@@ -22,6 +24,16 @@ namespace GoodDataTests.Api
 			var uris = ReportingService.GetQueryLinks(projectId, ObjectTypes.Dashboard);
 			var response = ReportingService.ExportPartials(projectId, uris);
 			Assert.NotNull(response);
+		}
+
+		[Test]
+		public void ImportPartials_ExpectSucces()
+		{
+			var projectId = GetTestProject().ProjectId;
+			var uris = ReportingService.GetQueryLinks(projectId, ObjectTypes.Dashboard);
+			var response = ReportingService.ExportPartials(projectId, new List<string>() {uris.First()});
+			var importResponse = ReportingService.ImportPartials(projectId,response.Token);
+			Assert.NotNull(importResponse);
 		}
 
 

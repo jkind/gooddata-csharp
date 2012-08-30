@@ -69,9 +69,9 @@ namespace GoodDataTests.Api
 
 		[Test]
 		[Ignore]
-		public void DeleteMySqlProjects()
+		public void DeleteProjects()
 		{
-			var projects = ReportingService.GetProjects().Where(x=>x.Content.Driver==SystemPlatforms.MySql).Where(x=>!x.Meta.Title.Contains("release")).ToList();
+			var projects = ReportingService.GetProjects().Where(x => x.Meta.Title.Contains("local - ") | x.Meta.Title.Contains("dev - ") | x.Meta.Title.Contains("release - ") | x.Meta.Title.Contains("staging - ")).ToList();
 			projects.ForEach(x => Console.WriteLine(x.Meta.Title));
 			//foreach (var project in projects)
 			//{
@@ -79,9 +79,9 @@ namespace GoodDataTests.Api
 			//    {
 			//        ReportingService.DeleteProject(project.ProjectId);
 			//    }
-			//    catch (Exception)
+			//    catch (Exception ex)
 			//    {
-					
+			//        Console.WriteLine(ex);
 			//    }
 			//}
 			Assert.NotNull(projects);

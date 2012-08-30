@@ -106,34 +106,47 @@ namespace GoodDataTests.Api
 		[Ignore]
 		public void CreateUserFilter_Equals_ExpectSucces()
 		{
-			BaseUserFilterTest(new List<string>() {"43"},true);
+			BaseUserFilterTest("Segment Id",new List<string>() {"43"},true);
 		}
 
 		[Test]
 		[Ignore]
 		public void CreateUserFilter_NotEquals_ExpectSucces()
 		{
-			BaseUserFilterTest(new List<string>() { "43" },false);
+			BaseUserFilterTest("Segment Id",new List<string>() { "43" },false);
 		}
 
 		[Test]
 		[Ignore]
 		public void CreateUserFilter_In_ExpectSucces()
 		{
-			BaseUserFilterTest(new List<string>() {"43", "75"},true);
+			BaseUserFilterTest("Segment Id",new List<string>() {"43", "75"},true);
 		}
 
 		[Test]
 		[Ignore]
 		public void CreateUserFilter_NotIn_ExpectSucces()
 		{
-			BaseUserFilterTest(new List<string>() { "43", "75" }, false);
+			BaseUserFilterTest(" Id", new List<string>() { "43", "75" }, false);
 		}
 
-		private void BaseUserFilterTest(List<string> expresionfilter, bool inclusive, bool deleteUser=true)
+		[TestCase("Sourcing Partner Id", "29")]
+		//[TestCase("Affiliate Id", "0")]
+		//[TestCase("Merchant Id", "7929")]
+		//[TestCase("Publisher Id", "5")]
+		//[TestCase("Segment Id", "43,75")]
+		[Ignore]
+		public void CreateUserFilter_ExpectSucces(string filterName, string filter)
+		{
+			var filters = filter.Split(',');
+			var expresionfilter = filters.ToList();
+			BaseUserFilterTest(filterName, expresionfilter, false);
+		}
+
+		private void BaseUserFilterTest(string attributeTitle, List<string> expresionfilter, bool inclusive, bool deleteUser=true)
 		{
 			var title = DateTime.Now.Ticks.ToString();
-			var login = string.Format("jkind+{0}@{1}.com", title, ReportingService.Config.Domain);
+			var login = string.Format("tester+{0}@{1}.com", title, ReportingService.Config.Domain);
 			var password = "password";
 			var firstName = "firstname" + title;
 			var lastName = "lastName" + title;
@@ -144,8 +157,8 @@ namespace GoodDataTests.Api
 			var projectId = GetTestProject().ProjectId;
 			ReportingService.AddUsertoProject(projectId, newProfileId, SystemRoles.Viewer);
 
-			var filterTitle = login + " - Segment Id";
-			var response = ReportingService.CreateUserFilter(projectId,filterTitle, "Segment Id", expresionfilter,inclusive);
+			var filterTitle = login + " - " + attributeTitle;
+			var response = ReportingService.CreateUserFilter(projectId, filterTitle, attributeTitle, expresionfilter, inclusive);
 			Assert.IsNotNullOrEmpty(response);
 			var filter = ReportingService.GetObject(response);
 			Assert.IsNotNull(filter);
@@ -216,6 +229,15 @@ namespace GoodDataTests.Api
 		}
 
 		[Test]
+		[Ignore]
+		public void FindDomainUsers_ExpectSucces()
+		{
+			var email = string.Format("ssotester@{0}.com", ReportingService.Config.Domain);
+			var user = ReportingService.FindDomainUsersByLogin(email);
+			Assert.IsNotNull(user);
+		}
+
+		[Test]
 		public void GetProjectUsers_ExpectSucces()
 		{
 			var projectId = ReportingService.CreateProject("ProjectUserTest", "Project User Test Summary");
@@ -232,6 +254,17 @@ namespace GoodDataTests.Api
 			Assert.IsNotEmpty(users);
 
 			ReportingService.DeleteProject(projectId);
+		}
+
+		[Test]
+		[Ignore]
+		public void GetFullProjectUsersByEmail_ExpectRoles()
+		{
+			var email = ReportingService.Config.Login;
+			var user = ReportingService.GetFullProjectUsersByEmail(GetTestProject().ProjectId, email);
+			Assert.IsNotNull(user);
+			Assert.IsNotNull(user.RoleNames);
+			Assert.IsNotNull(user.UserFilterNames);
 		}
 
 		[Test]
