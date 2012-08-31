@@ -15,11 +15,7 @@ namespace GoodDataService.SSO
 		public GnuPgpProcessor()
 		{
 			var path = new GpgPath();
-			_gpg = new GnuPG
-				      {
-					      HomePath = path.GetHomeFolderPath(), 
-						  BinaryPath = path.GetExeFullPath()
-				      };
+			_gpg = new GnuPG(path.GetHomeFolderPath(), path.GetExeFolder());
 		}
 
 		/// <summary>

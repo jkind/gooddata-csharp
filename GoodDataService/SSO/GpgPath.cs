@@ -42,7 +42,7 @@ namespace GoodDataService.SSO
 				.FirstOrDefault(File.Exists);
 		}
 
-		public string GetExeFullPath()
+		public string GetExeFolder()
 		{
 			string path = PathOrDefault("gpg.exe") ?? PathOrDefault("gpg2.exe");
 			if (default(string) == path)
@@ -54,7 +54,8 @@ namespace GoodDataService.SSO
 					string.Format("gpg.exe/gpg2.exe could not be found at the following locations. Make sure it is installed. {0}{1}",
 					              Environment.NewLine, searchedLocations));
 			}
-			return Path.GetFullPath(path);
+			string fullpath = Path.GetFullPath(path);
+			return Path.GetDirectoryName(fullpath);
 		}
 
 		public string GetHomeFolderPath()
@@ -66,23 +67,14 @@ namespace GoodDataService.SSO
 			return values[0];
 		}
 
-		#region Nested type: ConfigValue
 
 		private class ConfigValue : IFolderLocations
 		{
-			#region IFolderLocations Members
-
 			public IEnumerable<string> ResolveFolders()
 			{
 				return ConfigurationManager.AppSettings.GetValues(ExeFolderPathKey) ?? new string[0];
 			}
-
-			#endregion
 		}
-
-		#endregion
-
-		#region Nested type: ExplicitPath
 
 		private class ExplicitPath : IFolderLocations
 		{
@@ -93,33 +85,19 @@ namespace GoodDataService.SSO
 				_folderPath = folderPath;
 			}
 
-			#region IFolderLocations Members
-
 			public IEnumerable<string> ResolveFolders()
 			{
 				yield return _folderPath;
 			}
-
-			#endregion
 		}
-
-		#endregion
-
-		#region Nested type: IFolderLocations
 
 		private interface IFolderLocations
 		{
 			IEnumerable<string> ResolveFolders();
 		}
 
-		#endregion
-
-		#region Nested type: PathEnvironmentVariable
-
 		private class PathEnvironmentVariable : IFolderLocations
 		{
-			#region IFolderLocations Members
-
 			public IEnumerable<string> ResolveFolders()
 			{
 				try
@@ -132,13 +110,7 @@ namespace GoodDataService.SSO
 					return new string[0];
 				}
 			}
-
-			#endregion
 		}
-
-		#endregion
-
-		#region Nested type: RegistryValue
 
 		private class RegistryValue : IFolderLocations
 		{
@@ -154,8 +126,6 @@ namespace GoodDataService.SSO
 				_view = view;
 				_path = path;
 			}
-
-			#region IFolderLocations Members
 
 			public IEnumerable<string> ResolveFolders()
 			{
@@ -178,10 +148,6 @@ namespace GoodDataService.SSO
 					}
 				}
 			}
-
-			#endregion
 		}
-
-		#endregion
 	}
 }
