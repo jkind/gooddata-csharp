@@ -11,9 +11,10 @@ namespace GoodDataTests.SSO
 		[Test, Explicit]
 		public void GpgIsInstalled()
 		{
-			string exePath = new GpgPath().GetExeFullPath();
-			Console.Out.WriteLine(exePath);
-			Assert.IsTrue(File.Exists(exePath));
+			string folder = new GpgPath().GetExeFolder();
+			string fullPath = Path.Combine(folder, "gpg.exe");
+			Console.Out.WriteLine(folder);
+			Assert.IsTrue(File.Exists(fullPath));
 		}
 	}
 }
