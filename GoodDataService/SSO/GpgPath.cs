@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
+using log4net;
 
 namespace GoodDataService.SSO
 {
@@ -11,6 +12,7 @@ namespace GoodDataService.SSO
 	{
 		private const string ExeFolderPathKey = "GoodDataService.SSO.GpgPath.ExeFolder";
 		private const string HomeFolderKey = "GoodDataService.SSO.GpgPath.HomeFolder";
+		private static readonly ILog Logger = LogManager.GetLogger(typeof (GpgPath));
 
 		private static readonly IFolderLocations[] PossibleExeFolders = new IFolderLocations[]
 			                                                                {
@@ -35,11 +37,23 @@ namespace GoodDataService.SSO
 
 		private static string PathOrDefault(string fileName)
 		{
-			return PossibleExeFolders
+			var possibilities = PossibleExeFolders
 				.SelectMany(p => p.ResolveFolders())
 				.Where(folder => folder != null)
-				.Select(folder => Path.Combine(folder, fileName))
-				.FirstOrDefault(File.Exists);
+				.Select(folder => Path.Combine(folder, fileName));
+
+			foreach (var possible in possibilities)
+			{
+				if (File.Exists(possible))
+				{
+					Logger.DebugFormat("Found: {0}", possible);
+					return possible;
+				}
+
+				Logger.DebugFormat("Not found: {0}", possible);
+			}
+
+			return default(string);
 		}
 
 		public string GetExeFolder()
@@ -105,8 +119,9 @@ namespace GoodDataService.SSO
 					return Environment.GetEnvironmentVariable("PATH")
 						.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
+					Logger.DebugFormat("Could not read path environment variable: {0}{1}", e.Message, e.StackTrace);
 					return new string[0];
 				}
 			}
@@ -137,8 +152,10 @@ namespace GoodDataService.SSO
 						subKey = baseKey.OpenSubKey(_path);
 						return new[] {(string) subKey.GetValue(_value, string.Empty)};
 					}
-					catch (Exception)
+					catch (Exception e)
 					{
+						Logger.DebugFormat("Could not read registry value. Hive:{0}, View:{1}, Path:{2}, Value:{3}: {4}{5}",
+						                   _hive, _view, _path, _value, e.Message, e.StackTrace);
 						return new string[0];
 					}
 					finally
