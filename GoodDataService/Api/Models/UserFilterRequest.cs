@@ -14,9 +14,56 @@ namespace GoodDataService.Api.Models
 //    }
 //    }
 
+
 	public class UserFilterRequest
 	{
 		public UserFilter UserFilter { get; set; }
+
+		public UserFilterRequest(string title, Dictionary<string,List<string>> fillterCollection, bool inclusive = true)
+		{
+			var expressions = new List<string>();
+			foreach (var item in fillterCollection)
+			{
+				var expressionType = ExpressionTypes.Equal;
+				if (item.Value.Count > 1)
+					expressionType = ExpressionTypes.In;
+
+				if (!inclusive)
+				{
+					expressionType = ExpressionTypes.NotEqual;
+					if (item.Value.Count > 1)
+						expressionType = ExpressionTypes.NotIn;
+				}
+
+				//default, equals pattern
+				var pattern = "[{0}]=[{1}]";
+				var expression = string.Format(pattern, item.Key, string.Join(",", item.Value));
+				if (expressionType == ExpressionTypes.NotEqual)
+				{
+					pattern = "[{0}]<>[{1}]";
+					expression = string.Format(pattern, item.Key, string.Join(",", item.Value));
+				}
+				if (expressionType == ExpressionTypes.In || expressionType == ExpressionTypes.NotIn)
+				{
+					pattern = (expressionType == ExpressionTypes.In) ? "[{0}] IN ([{1}])" : "[{0}] NOT IN ([{1}])";
+					expression = string.Format(pattern, item.Key, string.Join("],[", item.Value));
+				}
+				expressions.Add(expression);
+			}
+
+			UserFilter = new UserFilter
+			             	{
+			             		Content = new UserFilterContent()
+			             		          	{
+			             		          		Expression = string.Join(" AND ", expressions)
+			             		          	},
+			             		Meta = new UserFilterMeta()
+			             		       	{
+			             		       		Title = title
+			             		       	}
+			             	};
+		}
+
 		public UserFilterRequest(string title, string name, List<string> value, bool inclusive = true)
 		{
 			var expressionType = ExpressionTypes.Equal;

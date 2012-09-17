@@ -106,44 +106,48 @@ namespace GoodDataTests.Api
 		[Ignore]
 		public void CreateUserFilter_Equals_ExpectSucces()
 		{
-			BaseUserFilterTest("Segment Id",new List<string>() {"43"},true);
+			var filterCollection = new Dictionary<string, List<string>>();
+			filterCollection.Add("Segment Id", new List<string> { "43" });
+			BaseUserFilterTest(filterCollection, true);
 		}
 
 		[Test]
 		[Ignore]
 		public void CreateUserFilter_NotEquals_ExpectSucces()
 		{
-			BaseUserFilterTest("Segment Id",new List<string>() { "43" },false);
+			var filterCollection = new Dictionary<string, List<string>>();
+			filterCollection.Add("Segment Id", new List<string> { "43" });
+			BaseUserFilterTest(filterCollection, false);
 		}
 
 		[Test]
 		[Ignore]
 		public void CreateUserFilter_In_ExpectSucces()
 		{
-			BaseUserFilterTest("Segment Id",new List<string>() {"43", "75"},true);
+			var filterCollection = new Dictionary<string, List<string>>();
+			filterCollection.Add("Segment Id", new List<string> { "43", "75" });
+			BaseUserFilterTest(filterCollection, true);
 		}
 
 		[Test]
 		[Ignore]
 		public void CreateUserFilter_NotIn_ExpectSucces()
 		{
-			BaseUserFilterTest(" Id", new List<string>() { "43", "75" }, false);
+			var filterCollection = new Dictionary<string, List<string>>();
+			filterCollection.Add("Segment Id", new List<string> {"43", "75"});
+			BaseUserFilterTest(filterCollection,  false);
 		}
 
-		[TestCase("Sourcing Partner Id", "29")]
-		//[TestCase("Affiliate Id", "0")]
-		//[TestCase("Merchant Id", "7929")]
-		//[TestCase("Publisher Id", "5")]
-		//[TestCase("Segment Id", "43,75")]
+		[Test]
 		[Ignore]
-		public void CreateUserFilter_ExpectSucces(string filterName, string filter)
+		public void CreateUserFilter_ExpectSucces()
 		{
-			var filters = filter.Split(',');
-			var expresionfilter = filters.ToList();
-			BaseUserFilterTest(filterName, expresionfilter, false);
+			var filterCollection = new Dictionary<string, List<string>>();
+			filterCollection.Add("Merchant Id", new List<string> {"7929"});
+			BaseUserFilterTest(filterCollection, true, false);
 		}
 
-		private void BaseUserFilterTest(string attributeTitle, List<string> expresionfilter, bool inclusive, bool deleteUser=true)
+		private void BaseUserFilterTest(Dictionary<string, List<string>> filterCollection, bool inclusive, bool delete=true)
 		{
 			var title = DateTime.Now.Ticks.ToString();
 			var login = string.Format("tester+{0}@{1}.com", title, ReportingService.Config.Domain);
@@ -157,8 +161,8 @@ namespace GoodDataTests.Api
 			var projectId = GetTestProject().ProjectId;
 			ReportingService.AddUsertoProject(projectId, newProfileId, SystemRoles.Viewer);
 
-			var filterTitle = login + " - " + attributeTitle;
-			var response = ReportingService.CreateUserFilter(projectId, filterTitle, attributeTitle, expresionfilter, inclusive);
+			var filterTitle = login;
+			var response = ReportingService.CreateUserFilter(projectId, filterTitle, filterCollection, inclusive);
 			Assert.IsNotNullOrEmpty(response);
 			var filter = ReportingService.GetObject(response);
 			Assert.IsNotNull(filter);
@@ -166,12 +170,14 @@ namespace GoodDataTests.Api
 			var assignResponse = ReportingService.AssignUserFilters(projectId, new List<string> { newProfileId }, new List<string> { response });
 			Assert.IsTrue(assignResponse.Successful.Any(item => item.Contains(newProfileId)));
 
-			ReportingService.DeleteObjectByTitle(projectId, filterTitle,ObjectTypes.UserFilter);
-			var items = ReportingService.FindObjectByTitle(projectId, filterTitle, ObjectTypes.UserFilter);
-			Assert.True(items.Count==0);
-
-			if (deleteUser)
+			if (delete)
 			{
+
+				ReportingService.DeleteObjectByTitle(projectId, filterTitle, ObjectTypes.UserFilter);
+				var items = ReportingService.FindObjectByTitle(projectId, filterTitle, ObjectTypes.UserFilter);
+				Assert.True(items.Count == 0);
+
+
 				ReportingService.DeleteUser(newProfileId);
 				var domainUser = ReportingService.FindDomainUsersByLogin(login);
 				Assert.IsNull(domainUser);

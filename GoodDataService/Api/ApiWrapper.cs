@@ -263,34 +263,42 @@ namespace GoodDataService.Api
 			DeleteObjectByTitle(projectId, filterTitle, ObjectTypes.UserFilter);
 		}
 
-		public string CreateUserFilter(string projectId, string filterTitle, string attributeTitle, List<string> elementFilter, bool inclusive=true)
-		{
-			
-			var attribute = FindAttributeByTitle(projectId, attributeTitle);
-			if (attribute == null)
-			{
-				Console.WriteLine(string.Format("No attribute found with title {0}",attributeTitle));
-				return null;
-			}
 
-			var elements = new List<Element>();
-			foreach (var item in elementFilter)
+		public string CreateUserFilter(string projectId, string filterTitle, Dictionary<string,List<string>> fillterCollection, bool inclusive = true)
+		{
+			var items = new Dictionary<string, List<string>>();
+			var attributes = Query(projectId, ObjectTypes.Attribute);
+			foreach (var item in fillterCollection)
 			{
-				var fullAttribute = FindAttributeElementByTitle(projectId, attribute, item);
-				if (fullAttribute != null)
+				var attribute = FindAttributeByTitle(projectId, item.Key, attributes);
+				if (attribute == null)
 				{
-					elements.Add(fullAttribute);
+					Console.WriteLine(string.Format("No attribute found with title {0}", item.Key));
+					return null;
 				}
-				
+
+				var attributeElements = GetAttributeElements(projectId, attribute);
+
+				var elements = new List<Element>();
+				foreach (var elementTitle in item.Value)
+				{
+					var fullAttribute = FindAttributeElementByTitle(projectId, attribute, elementTitle, attributeElements);
+					if (fullAttribute != null)
+					{
+						elements.Add(fullAttribute);
+					}
+
+				}
+				if (elements.Count == 0)
+				{
+					Console.WriteLine(string.Format("No element {0} found for attribute {1}", string.Join(",", item.Value),
+					                                attribute.Meta.Identifier));
+					return null;
+				}
+				items.Add(attribute.Meta.Uri,elements.Select(element => element.Uri).ToList());
 			}
-			if (elements.Count == 0)
-			{
-				Console.WriteLine(string.Format("No element {0} found for attribute {1}",string.Join(",",elementFilter),attribute.Meta.Identifier));
-				return null;
-			}
-			
 			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, "/obj");
-			var payload = new UserFilterRequest(filterTitle, attribute.Meta.Uri, elements.Select(element => element.Uri).ToList(), inclusive);
+			var payload = new UserFilterRequest(filterTitle, items, inclusive);
 			var response = PostRequest(url, payload);
 			var filterResponse = JsonConvert.DeserializeObject(response, typeof(UriResponse)) as UriResponse;
 			return filterResponse.Uri;
@@ -312,10 +320,13 @@ namespace GoodDataService.Api
 			return item;
 		}
 
-		public Models.Attribute FindAttributeByTitle(string projectId, string attributeTitle)
+		public Models.Attribute FindAttributeByTitle(string projectId, string attributeTitle,  List<Entry> attributes=null)
 		{
-			var attributes = Query(projectId, ObjectTypes.Attribute).FindByTitle((attributeTitle ?? "").Trim());
-			if (attributes == null) return null;
+			if (attributes == null)
+				attributes = Query(projectId, ObjectTypes.Attribute);
+			if (attributes == null)
+				return null;
+			attributes = attributes.FindByTitle((attributeTitle ?? "").Trim());
 	
 			var url = string.Concat(Config.Url, attributes.First().Link);
 			var response = GetRequest(url);
@@ -333,9 +344,10 @@ namespace GoodDataService.Api
 			return attributeElemntsResponse.AttributeElements.Elements;
 		}
 
-		public Element FindAttributeElementByTitle(string projectId, Models.Attribute attribute, string elementTitle)
+		public Element FindAttributeElementByTitle(string projectId, Models.Attribute attribute, string elementTitle, List<Element> elements=null)
 		{
-			var elements = GetAttributeElements(projectId, attribute);
+			if (elements ==null)
+				elements = GetAttributeElements(projectId, attribute);
 			return elements.FirstOrDefault(x => x.Title.Equals(elementTitle, StringComparison.OrdinalIgnoreCase));
 		}
 
