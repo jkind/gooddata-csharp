@@ -78,10 +78,11 @@ namespace GoodDataService.Api
 			return projects.FirstOrDefault(u => u.Meta.Title.Equals((title ?? "").Trim(), StringComparison.OrdinalIgnoreCase));
 		}
 
-		public ProjectUserFilters GetProjectUserFilters(string projectId)
+		public ProjectUserFilters GetProjectUserFilters(string projectId, int count=1000, int offset=0)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_USERFILTERS_SUFFIX);
+			var paging = string.Format("?count={0}&offset={1}", count,offset);
+			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_USERFILTERS_SUFFIX, paging);
 			var response = GetRequest(url);
 			var ProjectUserFiltersResponse = JsonConvert.DeserializeObject(response, typeof(ProjectUserFiltersResponse)) as ProjectUserFiltersResponse;
 			return ProjectUserFiltersResponse.UserFilters;

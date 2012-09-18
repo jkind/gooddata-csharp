@@ -12,6 +12,7 @@
     <releaseNotes>
 		Fix CreateUserFilter to allow ANDing of filters in an expression.
 		Allow for passing in attributes or attribute elements to optimize for batch loading.
+		Add GetProjectUserFilters
 	</releaseNotes>
     <copyright>Copyright 2012</copyright>
     <references>
