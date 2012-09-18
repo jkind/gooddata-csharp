@@ -158,7 +158,7 @@ namespace GoodDataTests.Api
 			var newProfileId = ReportingService.CreateUser(login, password, password, firstName, lastName, ssoProvider.ToLower(), "US");
 			Assert.IsNotNullOrEmpty(newProfileId);
 
-			var projectId = GetTestProject().ProjectId;
+			var projectId = GetTestProjectId();
 			ReportingService.AddUsertoProject(projectId, newProfileId, SystemRoles.Viewer);
 
 			var filterTitle = login;
@@ -267,7 +267,7 @@ namespace GoodDataTests.Api
 		public void GetFullProjectUsersByEmail_ExpectRoles()
 		{
 			var email = ReportingService.Config.Login;
-			var user = ReportingService.GetFullProjectUsersByEmail(GetTestProject().ProjectId, email);
+			var user = ReportingService.GetFullProjectUsersByEmail(GetTestProjectId(), email);
 			Assert.IsNotNull(user);
 			Assert.IsNotNull(user.RoleNames);
 			Assert.IsNotNull(user.UserFilterNames);

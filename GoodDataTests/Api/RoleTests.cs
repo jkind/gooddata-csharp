@@ -12,7 +12,7 @@ namespace GoodDataTests.Api
 		[Test]
 		public void FindRoleByTitle()
 		{
-			var projectId = GetTestProject().ProjectId;
+			var projectId = GetTestProjectId();
 			var role = ReportingService.FindRoleByTitle(projectId, SystemRoles.DashboardOnly);
 			Assert.NotNull(role);
 
@@ -32,7 +32,7 @@ namespace GoodDataTests.Api
 		{
 			var email = string.Format("tester+{0}@{1}.com", DateTime.Now.Ticks, ReportingService.Config.Domain);
 			var profileId = CreateTestUser(email);
-			var projectId = GetTestProject().ProjectId;
+			var projectId = GetTestProjectId();
 			ReportingService.AddUsertoProject(projectId, profileId);
 			ReportingService.UpdateProjectUserAccess(projectId, profileId, true,SystemRoles.Editor);
 			var user = ReportingService.FindProjectUsersByEmail(projectId,email);

@@ -10,7 +10,7 @@ namespace GoodDataTests.Api
 		public string TestProjectId { get; set; }
 		public QueryTests()
 		{
-			TestProjectId = GetTestProject().ProjectId;
+			TestProjectId = GetTestProjectId();
 		}
 
 		[Test]
