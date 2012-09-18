@@ -13,7 +13,7 @@ namespace GoodDataTests.Api
 		public void GetProjectUserFilters_ExpectSucces()
 		{
 			var reponse = ReportingService.GetProjectUserFilters(GetTestProjectId());
-			Assert.IsNotNull(reponse);
+			Assert.IsNotNull(reponse, string.Format("{0} Users with User Filters",reponse.Count.ToString()));
 		}
 
 		[Test]

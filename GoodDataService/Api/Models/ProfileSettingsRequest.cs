@@ -19,4 +19,16 @@
 
 		public ProfileSetting ProfileSetting { get; set; }
 	}
+
+	public class ProfileSetting
+	{
+		public Separators Separators { get; set; }
+
+	}
+	public class Separators
+	{
+		public string Thousand { get; set; }
+		public string Decimal { get; set; }
+	}
+		
 }

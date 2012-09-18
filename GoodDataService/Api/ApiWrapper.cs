@@ -78,6 +78,15 @@ namespace GoodDataService.Api
 			return projects.FirstOrDefault(u => u.Meta.Title.Equals((title ?? "").Trim(), StringComparison.OrdinalIgnoreCase));
 		}
 
+		public ProjectUserFilters GetProjectUserFilters(string projectId)
+		{
+			CheckAuthentication();
+			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_USERFILTERS_SUFFIX);
+			var response = GetRequest(url);
+			var ProjectUserFiltersResponse = JsonConvert.DeserializeObject(response, typeof(ProjectUserFiltersResponse)) as ProjectUserFiltersResponse;
+			return ProjectUserFiltersResponse.UserFilters;
+		}
+
 		#endregion
 
 		#region Export/Import
@@ -714,35 +723,5 @@ namespace GoodDataService.Api
 		#endregion
 	}
 
-	public class ProfileSettingsRequest
-	{
-		public static ProfileSettingsRequest CreateUSFormat()
-		{
-			return new ProfileSettingsRequest
-			       	{
-			       		ProfileSetting = new ProfileSetting
-			       		                 	{
-			       		                 		Separators = new Separators
-			       		                 		             	{
-			       		                 		             		Decimal = ".",
-			       		                 		             		Thousand = ","
-			       		                 		             	}
-			       		                 	}
-			       	};
-		}
-
-		public ProfileSetting ProfileSetting { get; set; }
-	}
-
-	public class ProfileSetting
-	{
-		public Separators Separators { get; set; }
-
-	}
-	public class Separators
-	{
-		public string Thousand { get; set; }
-		public string Decimal { get; set; }
-    }
-		
+	
 }
