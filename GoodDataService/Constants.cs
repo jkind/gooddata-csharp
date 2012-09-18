@@ -27,6 +27,7 @@
 		public static readonly string PROJECT_PARTIAL_IMPORT_URI = "/maintenance/partialmdimport";
 		public static readonly string PROJECT_ROLES_SUFFIX = "/roles";
 		public static readonly string PROJECT_USERS_SUFFIX = "/users";
+		public static readonly string PROJECT_USERFILTERS_SUFFIX = "/userfilters";
 		public static readonly string PULL_URI = "/etl/pull";
 		public static readonly string REPORT_QUERY = "/query/reports";
 		public static readonly string DASHBOARD_QUERY = "/query/projectdashboards";

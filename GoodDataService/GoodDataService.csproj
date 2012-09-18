@@ -60,6 +60,9 @@
     <Compile Include="Api\Models\RoleResponse.cs" />
     <Compile Include="Api\Models\UserFilterRequest.cs" />
     <Compile Include="Api\Models\RolesResponse.cs" />
+    <Compile Include="Api\Models\ProfileSettingsRequest.cs" />
+    <Compile Include="Api\Models\ProjectUserFiltersResponse.cs" />
+    <Compile Include="Api\Models\UserFilters.cs" />
     <Compile Include="BoolConverter.cs" />
     <Compile Include="SSO\GnuPgpProcessor.cs" />
     <Compile Include="Constants.cs" />

@@ -10,6 +10,13 @@ namespace GoodDataTests.Api
 	{
 
 		[Test]
+		public void GetProjectUserFilters_ExpectSucces()
+		{
+			var reponse = ReportingService.GetProjectUserFilters(GetTestProjectId());
+			Assert.IsNotNull(reponse);
+		}
+
+		[Test]
 		public void CreateProject_ExpectSucces()
 		{
 			var title = DateTime.Now.Ticks.ToString();

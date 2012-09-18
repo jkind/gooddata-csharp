@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using System.Diagnostics;
 using GoodDataService.Api;
 using GoodDataService.Api.Models;
 
@@ -17,9 +18,17 @@ namespace GoodDataTests.Api
 			get { return ConfigurationManager.AppSettings["TestProject"]; }
 		}
 
+		[DebuggerStepThrough]
 		public Project GetTestProject()
 		{
 			return ReportingService.FindProjectByTitle(TestProjectName);
+		}
+
+		[DebuggerStepThrough]
+		public string GetTestProjectId()
+		{
+			var project = GetTestProject();
+			return project.ProjectId;
 		}
 
 		public string CreateTestUser(string email)
