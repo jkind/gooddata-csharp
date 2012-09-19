@@ -19,6 +19,11 @@ namespace GoodDataService.Api.Models
 	{
 		public UserFilter UserFilter { get; set; }
 
+		public UserFilterRequest()
+		{
+			
+		}
+
 		public UserFilterRequest(string title, Dictionary<string,List<string>> fillterCollection, bool inclusive = true)
 		{
 			var expressions = new List<string>();
