@@ -85,6 +85,7 @@
     <Compile Include="SSO\SSOProvider.cs" />
     <Compile Include="StringExtension.cs" />
     <Compile Include="Api\Models\UsingResponse.cs" />
+    <Compile Include="Url.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
