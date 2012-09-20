@@ -53,6 +53,7 @@
     <Compile Include="Api\RoleTests.cs" />
     <Compile Include="Api\ExportTests.cs" />
     <Compile Include="Api\QueryTests.cs" />
+    <Compile Include="Api\UrlTests.cs" />
     <Compile Include="SSO\GpgPathTests.cs" />
     <Compile Include="SSO\SsoTests.cs" />
     <Compile Include="Api\UserTests.cs" />

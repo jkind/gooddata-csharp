@@ -18,6 +18,7 @@ namespace GoodDataService.Api.Models
 	public class AssignUserFilterRequest
 	{
 		public AssignUserFilter UserFilters { get; set; }
+
 		public AssignUserFilterRequest(IEnumerable<string> userprofileIds, List<string> userFilterUris)
 		{
 			UserFilters = new AssignUserFilter();

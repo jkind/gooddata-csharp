@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Api\ApiWrapper.cs" />
     <Compile Include="Api\ApiWrapperBase.cs" />
+    <Compile Include="Api\MandatoryUserFilter.cs" />
     <Compile Include="Api\Models\AttributeResponse.cs" />
     <Compile Include="Api\Models\AttributeElemntsResponse.cs" />
     <Compile Include="Api\Models\AssignUserFilterRequest.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="SSO\SSOProvider.cs" />
     <Compile Include="StringExtension.cs" />
     <Compile Include="Api\Models\UsingResponse.cs" />
+    <Compile Include="Url.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

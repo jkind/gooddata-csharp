@@ -19,6 +19,11 @@ namespace GoodDataService.Api.Models
 	{
 		public UserFilter UserFilter { get; set; }
 
+		public UserFilterRequest()
+		{
+			
+		}
+
 		public UserFilterRequest(string title, Dictionary<string,List<string>> fillterCollection, bool inclusive = true)
 		{
 			var expressions = new List<string>();
@@ -127,8 +132,16 @@ namespace GoodDataService.Api.Models
 
 	public class UserFilterObject
 	{
-		public string Category { get; set; }
+		public string Link { get; set; }
+		public string Author { get; set; }
+		public string Tags { get; set; }
+		public string Created { get; set; }
+		public string Deprecated { get; set; }
+		public string Summary { get; set; }
 		public string Title { get; set; }
+		public string Category { get; set; }
+		public string Updated { get; set; }
+		public string Contributor { get; set; }
 		public string AttributeUri { get; set; }
 		public string Uri { get; set; }
 	}

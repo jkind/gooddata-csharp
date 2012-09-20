@@ -5,17 +5,20 @@ using System.Net;
 using GoodDataService.Api.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using log4net;
 
 namespace GoodDataService.Api
 {
 	public class ApiWrapper : ApiWrapperBase
 	{
+		private static readonly ILog Logger = LogManager.GetLogger(typeof (ApiWrapper));
+		private readonly MandatoryUserFilter _mandatoryUserFilter = new MandatoryUserFilter();
 		#region Project
 
 		public string CreateProject(string title, string summary, string template = null, string driver = SystemPlatforms.PostGres)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.PROJECTS_URI);
+			var url = Url.Combine(Config.Url, Constants.PROJECTS_URI);
 			var payload = new ProjectResult()
 			              	{
 			              		Project = new Project
@@ -42,7 +45,7 @@ namespace GoodDataService.Api
 		{
 			CheckAuthentication();
 			var list = new List<Project>();
-			var url = string.Concat(Config.Url, Constants.PROFILE_URI, "/", ProfileId, "/projects");
+			var url = Url.Combine(Config.Url, Constants.PROFILE_URI, ProfileId, "projects");
 			var response = GetRequest(url);
 			var projectResponse = JsonConvert.DeserializeObject(response, typeof (ProjectsResponse)) as ProjectsResponse;
 			if (projectResponse != null)
@@ -55,7 +58,7 @@ namespace GoodDataService.Api
 		public void DeleteProject(string projectId)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId);
+			var url = Url.Combine(Config.Url, Constants.PROJECTS_URI, projectId);
 			DeleteRequest(url);
 		}
 
@@ -68,7 +71,7 @@ namespace GoodDataService.Api
 		public void DeleteObject(string projectId, string relativeUri)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, relativeUri);
+			var url = Url.Combine(Config.Url, relativeUri);
 			DeleteRequest(url);
 		}
 
@@ -82,7 +85,7 @@ namespace GoodDataService.Api
 		{
 			CheckAuthentication();
 			var paging = string.Format("?count={0}&offset={1}", count,offset);
-			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_USERFILTERS_SUFFIX, paging);
+			var url = Url.Combine(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_USERFILTERS_SUFFIX, paging);
 			var response = GetRequest(url);
 			var ProjectUserFiltersResponse = JsonConvert.DeserializeObject(response, typeof(ProjectUserFiltersResponse)) as ProjectUserFiltersResponse;
 			return ProjectUserFiltersResponse.UserFilters;
@@ -95,7 +98,7 @@ namespace GoodDataService.Api
 		public string ExecuteReport(string reportUri, ExportFormatTypes exportFormatType = ExportFormatTypes.csv)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.EXECUTOR);
+			var url = Url.Combine(Config.Url, Constants.EXECUTOR);
 
 			var payload = new ExecuteReportRequest
 			              	{
@@ -114,7 +117,7 @@ namespace GoodDataService.Api
 			CheckAuthentication();
 			var executeUri = ExecuteReport(reportUri);
 
-			var url = string.Concat(Config.Url, Constants.EXPORT_EXECUTOR);
+			var url = Url.Combine(Config.Url, Constants.EXPORT_EXECUTOR);
 
 			var payload = new ExportReportRequest
 			              	{
@@ -131,7 +134,7 @@ namespace GoodDataService.Api
 		public ExportArtifact ExportProject(string projectId, bool exportUsers = false, bool exportData = false)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_EXPORT_URI);
+			var url = Url.Combine(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_EXPORT_URI);
 
 			var payload = new ExportRequest
 			              	{
@@ -149,7 +152,7 @@ namespace GoodDataService.Api
 		public ExportArtifact ExportPartials(string projectId, List<string> uris)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_PARTIAL_EXPORT_URI);
+			var url = Url.Combine(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_PARTIAL_EXPORT_URI);
 
 			var payload = new PartialExportRequest
 			              	{
@@ -166,7 +169,7 @@ namespace GoodDataService.Api
 		public string ImportProject(string projectId, string token)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_IMPORT_URI);
+			var url = Url.Combine(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_IMPORT_URI);
 
 			var payload = new ImportRequest
 			              	{
@@ -184,7 +187,7 @@ namespace GoodDataService.Api
 		                             bool updateLdmObjects = false)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_PARTIAL_IMPORT_URI);
+			var url = Url.Combine(Config.Url, Constants.MD_URI, projectId, Constants.PROJECT_PARTIAL_IMPORT_URI);
 
 			var payload = new PartialImportRequest
 			              	{
@@ -203,7 +206,7 @@ namespace GoodDataService.Api
 		public bool PollStatus(string uri)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, uri);
+			var url = Url.Combine(Config.Url, uri);
 			var response = GetRequest(url);
 			var taskResponse = JsonConvert.DeserializeObject(response, typeof (TaskResponse)) as TaskResponse;
 			return (taskResponse.TaskState.Status == Enum.GetName(typeof (TaskStates), TaskStates.OK));
@@ -212,7 +215,7 @@ namespace GoodDataService.Api
 		public bool PollPartialStatus(string uri)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, uri);
+			var url = Url.Combine(Config.Url, uri);
 			var response = GetRequest(url);
 			var taskResponse = JsonConvert.DeserializeObject(response, typeof(PartialTaskResponse)) as PartialTaskResponse;
 			return (taskResponse.wTaskStatus.Status == "OK");
@@ -221,7 +224,7 @@ namespace GoodDataService.Api
 		public WebResponse GetFile(string uri)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, uri);
+			var url = Url.Combine(Config.Url, uri);
 			return GetFileResponse(url);
 		}
 
@@ -249,7 +252,7 @@ namespace GoodDataService.Api
 		public string CreateUser(string login, string password, string verfiyPassword, string firstName, string lastName, string ssoProvider = "", string country = "US")
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.DOMAIN_URI, "/", Config.Domain, Constants.DOMAIN_USERS_SUFFIX);
+			var url = Url.Combine(Config.Url, Constants.DOMAIN_URI, Config.Domain, Constants.DOMAIN_USERS_SUFFIX);
 			var payload = new DomainUserRequest
 			              	{
 			              		AccountSetting = new AccountSetting
@@ -283,7 +286,7 @@ namespace GoodDataService.Api
 				var attribute = FindAttributeByTitle(projectId, item.Key, attributes);
 				if (attribute == null)
 				{
-					Console.WriteLine(string.Format("No attribute found with title {0}", item.Key));
+					Logger.WarnFormat("No attribute found with title {0}", item.Key);
 					return null;
 				}
 
@@ -301,13 +304,12 @@ namespace GoodDataService.Api
 				}
 				if (elements.Count == 0)
 				{
-					Console.WriteLine(string.Format("No element {0} found for attribute {1}", string.Join(",", item.Value),
-					                                attribute.Meta.Identifier));
+					Logger.WarnFormat("No element {0} found for attribute {1}", string.Join(",", item.Value), attribute.Meta.Identifier);
 					return null;
 				}
 				items.Add(attribute.Meta.Uri,elements.Select(element => element.Uri).ToList());
 			}
-			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, "/obj");
+			var url = Url.Combine(Config.Url, Constants.MD_URI, projectId, "obj");
 			var payload = new UserFilterRequest(filterTitle, items, inclusive);
 			var response = PostRequest(url, payload);
 			var filterResponse = JsonConvert.DeserializeObject(response, typeof(UriResponse)) as UriResponse;
@@ -316,7 +318,7 @@ namespace GoodDataService.Api
 
 		public AssignUserFiltersUpdateResult AssignUserFilters(string projectId, List<string> userprofileIds, List<string> userFilterUris)
 		{
-			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, "/userfilters");
+			var url = Url.Combine(Config.Url, Constants.MD_URI, projectId, "userfilters");
 			var payload = new AssignUserFilterRequest(userprofileIds,userFilterUris);
 			var response = PostRequest(url, payload);
 			var assignResponse = JsonConvert.DeserializeObject(response, typeof(AssignUserFilterResponse)) as AssignUserFilterResponse;
@@ -338,7 +340,7 @@ namespace GoodDataService.Api
 				return null;
 			attributes = attributes.FindByTitle((attributeTitle ?? "").Trim());
 	
-			var url = string.Concat(Config.Url, attributes.First().Link);
+			var url = Url.Combine(Config.Url, attributes.First().Link);
 			var response = GetRequest(url);
 			var settings = new JsonSerializerSettings();
 			settings.Converters.Add(new BoolConverter());
@@ -348,7 +350,7 @@ namespace GoodDataService.Api
 
 		public List<Element> GetAttributeElements(string projectId, Models.Attribute attribute)
 		{
-			var url = string.Concat(Config.Url, attribute.Content.DisplayForms[0].Links.Elements);
+			var url = Url.Combine(Config.Url, attribute.Content.DisplayForms[0].Links.Elements);
 			var response = GetRequest(url);
 			var attributeElemntsResponse = JsonConvert.DeserializeObject(response, typeof(AttributeElemntsResponse)) as AttributeElemntsResponse;
 			return attributeElemntsResponse.AttributeElements.Elements;
@@ -363,13 +365,13 @@ namespace GoodDataService.Api
 
 		public List<ProjectRole> GetRoles(string projectId)
 		{
-			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.PROJECT_ROLES_SUFFIX);
+			var url = Url.Combine(Config.Url, Constants.PROJECTS_URI, projectId, Constants.PROJECT_ROLES_SUFFIX);
 			var response = GetRequest(url);
 			var rolesResponse = JsonConvert.DeserializeObject(response, typeof(RolesResponse)) as RolesResponse;
 			var list = new List<ProjectRole>();
 			foreach (var uri in rolesResponse.ProjectRoles.Roles)
 			{
-				var rawRoleResponse = GetRequest(string.Concat(Config.Url,uri));
+				var rawRoleResponse = GetRequest(Url.Combine(Config.Url, uri));
 				var roleResponse = JsonConvert.DeserializeObject(rawRoleResponse, typeof (RoleResponse)) as RoleResponse;
 				roleResponse.ProjectRole.RoleId = uri.ExtractObjectId();
 				roleResponse.ProjectRole.Meta.Uri = uri; 
@@ -393,7 +395,7 @@ namespace GoodDataService.Api
 			{
 				throw new ArgumentException(string.Format("No role found for role name: {0}", roleName));
 			}
-			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.PROJECT_USERS_SUFFIX);
+			var url = Url.Combine(Config.Url, Constants.PROJECTS_URI, projectId, Constants.PROJECT_USERS_SUFFIX);
 
 			var payload = new ProjectUserRequest
 			              	{
@@ -404,14 +406,12 @@ namespace GoodDataService.Api
 			              		       		          		Status = "ENABLED",
 			              		       		          		UserRoles = new List<string>
 			              		       		          		            	{
-			              		       		          		            		string.Concat(Constants.PROJECTS_URI, "/", projectId,
-			              		       		          		            		              Constants.PROJECT_ROLES_SUFFIX,
-			              		       		          		            		              "/", projectRole.RoleId)
+			              		       		          		            		Url.Combine(Constants.PROJECTS_URI, projectId, Constants.PROJECT_ROLES_SUFFIX, projectRole.RoleId)
 			              		       		          		            	}
 			              		       		          	},
 			              		       		Links = new ProjectUserRequest.UserRequest.LinksRequest
 			              		       		        	{
-			              		       		        		Self = string.Concat(Constants.PROFILE_URI, "/", userId)
+			              		       		        		Self = Url.Combine(Constants.PROFILE_URI, userId)
 			              		       		        	}
 			              		       	}
 			              	};
@@ -422,7 +422,7 @@ namespace GoodDataService.Api
 		{
 			CheckAuthentication();
 			var role = FindRoleByTitle(projectId, roleName);
-			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.PROJECT_USERS_SUFFIX);
+			var url = Url.Combine(Config.Url, Constants.PROJECTS_URI, projectId, Constants.PROJECT_USERS_SUFFIX);
 			var payload = new ProjectUserRequest
 			              	{
 			              		User = new ProjectUserRequest.UserRequest
@@ -434,7 +434,7 @@ namespace GoodDataService.Api
 			              		       		          	},
 			              		       		Links = new ProjectUserRequest.UserRequest.LinksRequest
 			              		       		        	{
-			              		       		        		Self = string.Concat(Constants.PROFILE_URI, "/", profileId)
+															Self = Url.Combine(Constants.PROFILE_URI, profileId)
 			              		       		        	}
 			              		       	}
 			              	};
@@ -444,7 +444,7 @@ namespace GoodDataService.Api
 		public void UpdateProfileSettings(string projectId, string profileId)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.PROFILE_URI, profileId, Constants.PROFILE_SETTINGS_SUFFIX);
+			var url = Url.Combine(Config.Url, Constants.PROFILE_URI, profileId, Constants.PROFILE_SETTINGS_SUFFIX);
 			var payload = ProfileSettingsRequest.CreateUSFormat();
 			PostRequest(url, payload);
 		}
@@ -452,7 +452,7 @@ namespace GoodDataService.Api
 		public void UpdateSSOProvider(string profileId)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.PROFILE_URI, "/",profileId);
+			var url = Url.Combine(Config.Url, Constants.PROFILE_URI, profileId);
 			var payload = new DomainUserRequest()
 			              	{
 			              		AccountSetting = new AccountSetting()
@@ -470,7 +470,7 @@ namespace GoodDataService.Api
 			if (string.IsNullOrEmpty(domain))
 				domain = Config.Domain;
 			var list = new List<AccountResponseSettingWrapper>();
-			var url = string.Concat(Config.Url, Constants.DOMAIN_URI, "/", domain, Constants.DOMAIN_USERS_SUFFIX);
+			var url = Url.Combine(Config.Url, Constants.DOMAIN_URI, domain, Constants.DOMAIN_USERS_SUFFIX);
 			GetDomainUsers(url, ref list);
 			return list;
 		}
@@ -490,12 +490,12 @@ namespace GoodDataService.Api
 				var nextSetUrl = (string)o["accountSettings"]["paging"]["next"];
 				if (nextSetUrl != null)
 				{
-					GetDomainUsers(string.Concat(Config.Url, nextSetUrl),ref list);
+					GetDomainUsers(Url.Combine(Config.Url, nextSetUrl), ref list);
 				}
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex);
+				Logger.Error(ex);
 			}
 		}
 
@@ -503,7 +503,7 @@ namespace GoodDataService.Api
 		{
 			CheckAuthentication();
 			var list = new List<UserWrapper>();
-			var url = string.Concat(Config.Url, Constants.PROJECTS_URI, "/", projectId, Constants.DOMAIN_USERS_SUFFIX);
+			var url = Url.Combine(Config.Url, Constants.PROJECTS_URI, projectId, Constants.DOMAIN_USERS_SUFFIX);
 			var response = GetRequest(url);
 			var usersResponse = JsonConvert.DeserializeObject(response, typeof (UserResponse)) as UserResponse;
 			if (usersResponse != null)
@@ -530,7 +530,7 @@ namespace GoodDataService.Api
 				var roleNames = new List<string>();
 				foreach (var role in userWrapper.User.Content.UserRoles)
 				{
-					var url = string.Concat(Config.Url, role);
+					var url = Url.Combine(Config.Url, role);
 					var response = GetRequest(url);
 					dynamic roleResponse = JsonConvert.DeserializeObject<object>(response);
 					var roleName = (string) roleResponse.projectRole.meta.title;
@@ -546,14 +546,13 @@ namespace GoodDataService.Api
 				{
 					if (userfilter.Title.Contains(userWrapper.User.Content.Email))
 					{
-						var url = string.Concat(Config.Url, userfilter.Link);
+						var url = Url.Combine(Config.Url, userfilter.Link);
 						var response = GetRequest(url);
 						var userFilterResponse =
 							JsonConvert.DeserializeObject(response, typeof (UserFilterResponse)) as UserFilterResponse;
 						var elements = userFilterResponse.UserFilter.Content.Objects.Where(x => x.Category == "attributeElement");
 						var titles = elements.Select(userFilterObject => userFilterObject.Title).ToList();
 						userfilterNames.Add(userfilter.Title.Replace(userWrapper.User.Content.Email + " - ", "") + ": " + string.Join(", ", titles));
-						Console.WriteLine("yes");
 					}
 				}
 				userWrapper.User.UserFilterNames = userfilterNames;
@@ -571,7 +570,7 @@ namespace GoodDataService.Api
 			var roleNames = new List<string>();
 			foreach (var role in userWrapper.User.Content.UserRoles)
 			{
-				var url = string.Concat(Config.Url, role);
+				var url = Url.Combine(Config.Url, role);
 				var response = GetRequest(url);
 				dynamic roleResponse = JsonConvert.DeserializeObject<object>(response);
 				var roleName = (string) roleResponse.projectRole.meta.title;
@@ -587,13 +586,12 @@ namespace GoodDataService.Api
 			{
 				if (userfilter.Title.Contains(email))
 				{
-					var url = string.Concat(Config.Url, userfilter.Link);
+					var url = Url.Combine(Config.Url, userfilter.Link);
 					var response = GetRequest(url);
 					var userFilterResponse = JsonConvert.DeserializeObject(response, typeof (UserFilterResponse)) as UserFilterResponse;
 					var elements = userFilterResponse.UserFilter.Content.Objects.Where(x=>x.Category=="attributeElement");
 					var titles = elements.Select(userFilterObject => userFilterObject.Title).ToList();
 					userfilterNames.Add(userfilter.Title.Replace(email + " - ", "") + ": " +string.Join(", ", titles));
-					Console.WriteLine("yes");
 				}
 			}
 			userWrapper.User.UserFilterNames = userfilterNames;
@@ -613,7 +611,7 @@ namespace GoodDataService.Api
 		public void DeleteUser(string profileId)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.PROFILE_URI, "/", profileId);
+			var url = Url.Combine(Config.Url, Constants.PROFILE_URI, profileId);
 			DeleteRequest(url);
 		}
 
@@ -624,7 +622,7 @@ namespace GoodDataService.Api
 		public IdentifiersResponse GetUris(string projectId, List<string> identifiers)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, projectId, Constants.IDENTIFIER_URI);
+			var url = Url.Combine(Config.Url, projectId, Constants.IDENTIFIER_URI);
 
 			var payload = identifiers;
 			var response = PostRequest(url, payload);
@@ -634,7 +632,7 @@ namespace GoodDataService.Api
 		public UsingResponse GetDependancies(string projectId, string objectId, bool? filterByReport = null)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, Constants.MD_URI, projectId, "/using/", objectId);
+			var url = Url.Combine(Config.Url, Constants.MD_URI, projectId, "using", objectId);
 			var response = GetRequest(url);
 			var usingResponse = JsonConvert.DeserializeObject(response, typeof (UsingResponse)) as UsingResponse;
 			if (usingResponse != null)
@@ -657,7 +655,7 @@ namespace GoodDataService.Api
 		public dynamic GetObject(string objectLink)
 		{
 			CheckAuthentication();
-			var url = string.Concat(Config.Url, objectLink);
+			var url = Url.Combine(Config.Url, objectLink);
 			var response = GetRequest(url);
 			return JsonConvert.DeserializeObject<object>(response);
 		}
@@ -674,7 +672,7 @@ namespace GoodDataService.Api
 				fragment = Constants.ATTRIBUTES_QUERY;
 			if (objectTypes == ObjectTypes.UserFilter)
 				fragment = Constants.USERFILTER_QUERY;
-			var response = GetRequest(string.Concat(Config.Url, Constants.MD_URI, projectId, fragment));
+			var response = GetRequest(Url.Combine(Config.Url, Constants.MD_URI, projectId, fragment));
 			var settings = new JsonSerializerSettings();
 			settings.Converters.Add(new BoolConverter());
 			var queryResponse = JsonConvert.DeserializeObject(response, typeof(QueryResponse), settings) as QueryResponse;
@@ -723,6 +721,4 @@ namespace GoodDataService.Api
 
 		#endregion
 	}
-
-	
 }
