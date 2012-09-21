@@ -75,7 +75,7 @@ namespace GoodDataService.Api
 
 		private string InternalPostRequest(string url, object postData, bool retry)
 		{
-			return MakeRequest(url, "POST", postData, retry);
+			return MakeRequest(url, "POST", postData, retry ? 3 : 0);
 		}
 
 		public string GetRequest(string url)
@@ -131,7 +131,7 @@ namespace GoodDataService.Api
 			}
 		}
 
-		private string MakeRequest(string url, string method, object postData, bool retry = true)
+		private string MakeRequest(string url, string method, object postData, int retries = 3)
 		{
 			var webRequest = WebRequest.Create(url) as HttpWebRequest;
 			// allows for skipping validation warnings such as from self-signed certs
@@ -165,16 +165,18 @@ namespace GoodDataService.Api
 					var httpResponse = (HttpWebResponse) exceptionResponse;
 					Trace.WriteLine(string.Format("Error code: {0}", httpResponse.StatusCode));
 					//Retry the request by reauth and get token;
-					if (retry && httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+					if (retries > 0 && httpResponse.StatusCode == HttpStatusCode.Unauthorized)
 					{
 						CheckAuthentication();
-						MakeRequest(url, method, postData);
+						return MakeRequest(url, method, postData, retries - 1);
 					}
-
-					using (var data = exceptionResponse.GetResponseStream())
+					else
 					{
-						var text = new StreamReader(data).ReadToEnd();
-						throw new GoodDataApiException(text);
+						using (var data = exceptionResponse.GetResponseStream())
+						{
+							var text = new StreamReader(data).ReadToEnd();
+							throw new GoodDataApiException(text);
+						}
 					}
 				}
 			}
